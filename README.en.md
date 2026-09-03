@@ -330,6 +330,7 @@ That's why `http_response_code()` is called **after** the headers. (The same beh
 - Token generation with scope selection
 - The plaintext is shown **only once**
 - Last-used timestamp and IP
+- Lifetime request counter (in the Details modal)
 - Revocation (without deletion)
 - API documentation page with copy-pasteable `curl` examples
 - **Example Usage**: cURL, PHP, JavaScript, Python
@@ -638,7 +639,8 @@ Route matched: ['api', 'scope:read']
    │    2. hash('sha256', $token)                             │
    │    3. SELECT ... WHERE token_hash = ? AND revoked_at IS NULL
    │       not found / account inactive → 401 invalid_token   │
-   │    4. last_used_at and last_used_ip are updated          │
+   │    4. last_used_at, last_used_ip are updated,            │
+   │       request_count += 1 (atomic)                        │
    │                                                          │
    │  ApiRateLimiter::check($tokenId, $ip)                    │
    │    SELECT COUNT(*) FROM api_requests                     │
@@ -680,6 +682,7 @@ ApiResponse::collection($items, $paginator, 'api/v1/users')
 | `token_hash` | CHAR(64) | The **SHA-256 digest** — the plaintext is stored nowhere |
 | `scopes` | VARCHAR(100) | Comma-separated scopes (`read,write`) |
 | `last_used_at` · `last_used_ip` | DATETIME · VARCHAR(45) | Last use — the easiest way to spot suspicious activity |
+| `request_count` | INT UNSIGNED | **Lifetime** request count. Read from this column, not `api_requests` — that table is only the rate-limit window and gets pruned after an hour (see below); deriving a total from it would give a shrinking, wrong number over time. Bumped **atomically** on every request with `request_count = request_count + 1` |
 | `revoked_at` | DATETIME | If set, the token is invalid; the row is **not deleted** |
 | `created_at` | DATETIME | When it was generated |
 

@@ -315,6 +315,13 @@ CREATE TABLE `api_tokens` (
   `last_used_at` DATETIME     NULL DEFAULT NULL,
   `last_used_ip` VARCHAR(45)  NOT NULL DEFAULT '',
 
+  -- Jetonun ÖMÜR BOYU istek sayısı. api_requests tablosu bunun için
+  -- KAYNAK DEĞİLDİR: o tablo yalnızca hız sınırının kayan penceresi
+  -- içindir ve ApiRateLimiter::prune() satırları 1 saat sonra siler
+  -- (bkz. o dosya). Kalıcı bir sayaç için ayrı bir alan gerekiyordu;
+  -- her istekte "request_count = request_count + 1" ile artırılır.
+  `request_count` INT UNSIGNED NOT NULL DEFAULT 0,
+
   -- İptal SİLME DEĞİLDİR: "ne zaman iptal edildi" bilgisi bir
   -- güvenlik incelemesinde paha biçilmezdir.
   `revoked_at`   DATETIME     NULL DEFAULT NULL,
@@ -396,20 +403,20 @@ COLLATE=utf8mb4_unicode_ci;
 -- ===============================================================
 
 INSERT INTO `api_tokens`
-    (`id`, `user_id`, `name`, `token_hash`, `scopes`,
+    (`id`, `user_id`, `name`, `token_hash`, `scopes`, `request_count`,
      `last_used_at`, `last_used_ip`, `revoked_at`, `created_at`)
 VALUES
 (1, 1, 'Mobil uygulama',
  'bc18f268d28b6e5ab775e9813886f61b59b4f81e27ca54f5e1c817406297c07a',
- 'read,write', NOW() - INTERVAL 12 MINUTE, '127.0.0.1', NULL, NOW() - INTERVAL 21 DAY),
+ 'read,write', 2418, NOW() - INTERVAL 12 MINUTE, '127.0.0.1', NULL, NOW() - INTERVAL 21 DAY),
 
 (2, 1, 'Rapor betiği (salt okunur)',
  '97135353dfa44a29d83806ab8911f40dbcd513975ad4c79d1caae5873f35694c',
- 'read', NOW() - INTERVAL 1 DAY, '127.0.0.1', NULL, NOW() - INTERVAL 9 DAY),
+ 'read', 96, NOW() - INTERVAL 1 DAY, '127.0.0.1', NULL, NOW() - INTERVAL 9 DAY),
 
 (3, 2, 'Eski entegrasyon',
  '05be673a8d42f461c6644989c8948f05f23ee48af374e7534adc22e0ce92bdf5',
- 'read,write', NOW() - INTERVAL 34 DAY, '127.0.0.1', NOW() - INTERVAL 30 DAY, NOW() - INTERVAL 60 DAY);
+ 'read,write', 1204, NOW() - INTERVAL 34 DAY, '127.0.0.1', NOW() - INTERVAL 30 DAY, NOW() - INTERVAL 60 DAY);
 
 ALTER TABLE `api_tokens` AUTO_INCREMENT = 11;
 

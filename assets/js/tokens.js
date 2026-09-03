@@ -148,6 +148,7 @@
         $('#jd_ad').text($dugme.data('ad'));
         $('#jd_id').text('#' + $dugme.data('id'));
         $('#jd_kapsam').text($dugme.data('kapsam'));
+        $('#jd_istek').text($dugme.data('istek'));
         $('#jd_olusturma').text($dugme.data('olusturma'));
         $('#jd_kullanim').text($dugme.data('kullanim'));
         $('#jd_ip').text($dugme.data('ip'));

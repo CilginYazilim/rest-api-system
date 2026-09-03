@@ -330,6 +330,7 @@ Bu yüzden `http_response_code()` **başlıklardan sonra** çağrılır. (Aynı 
 - Jeton üretme, kapsam seçimi
 - Açık metin **yalnızca bir kez** gösterilir
 - Son kullanım tarihi ve IP
+- Ömür boyu istek sayacı (Detaylar modalında)
 - İptal etme (silmeden)
 - API belgeleri sayfası, kopyalanabilir `curl` örnekleri
 - **Örnek Kullanım**: cURL · PHP · JavaScript · Python
@@ -638,7 +639,8 @@ Rota bulundu: ['api', 'scope:read']
    │    2. hash('sha256', $jeton)                             │
    │    3. SELECT ... WHERE token_hash = ? AND revoked_at IS NULL
    │       bulunamadı / hesap pasif → 401 invalid_token       │
-   │    4. last_used_at ve last_used_ip güncellenir           │
+   │    4. last_used_at, last_used_ip güncellenir,           │
+   │       request_count += 1 (atomik)                        │
    │                                                          │
    │  ApiRateLimiter::check($tokenId, $ip)                    │
    │    SELECT COUNT(*) FROM api_requests                     │
@@ -680,6 +682,7 @@ ApiResponse::collection($items, $paginator, 'api/v1/users')
 | `token_hash` | CHAR(64) | **SHA-256 özeti** — açık metin hiçbir yerde saklanmaz |
 | `scopes` | VARCHAR(100) | Virgülle ayrılmış kapsamlar (`read,write`) |
 | `last_used_at` · `last_used_ip` | DATETIME · VARCHAR(45) | Son kullanım — şüpheli hareketi görmenin en kolay yolu |
+| `request_count` | INT UNSIGNED | **Ömür boyu** istek sayısı. `api_requests`'ten değil bu sütundan okunur — o tablo yalnızca hız sınırı penceresidir ve bir saat sonra silinir (aşağıya bakın); toplamı oradan üretmek zamanla küçülen, yanlış bir sayı verirdi. Her istekte `request_count = request_count + 1` ile **atomik** artırılır |
 | `revoked_at` | DATETIME | Dolu ise jeton geçersiz; satır **silinmez** |
 | `created_at` | DATETIME | Üretilme anı |
 

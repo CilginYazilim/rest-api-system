@@ -117,11 +117,24 @@ final class ApiTokenRepository
         return ApiToken::fromRow($row);
     }
 
-    /** Son kullanım zamanını damgalar (kullanılmayan jetonları görmek için). */
+    /**
+     * Son kullanım zamanını damgalar ve ömür boyu istek sayacını artırır.
+     *
+     * SAYAÇ NEDEN api_requests'TEN DEĞİL DE BURADAN?
+     * api_requests yalnızca hız sınırının kayan penceresidir ve
+     * ApiRateLimiter::prune() satırları 1 saat sonra siler — COUNT(*)
+     * ile toplam istek sayısı üretmeye çalışmak bir saat sonra yanlış
+     * (ve gitgide küçülen) bir sayı verirdi. request_count = request_count + 1
+     * ATOMİKTİR: iki isteğin aynı anda "önce oku, sonra yaz" yapıp
+     * birinin sayacı ezmesi riski yoktur.
+     */
     public function touch(int $id, string $ip): void
     {
         $stmt = $this->db->prepare(
-            'UPDATE api_tokens SET last_used_at = NOW(), last_used_ip = :ip WHERE id = :id'
+            'UPDATE api_tokens
+                SET last_used_at = NOW(), last_used_ip = :ip,
+                    request_count = request_count + 1
+              WHERE id = :id'
         );
         $stmt->execute([':ip' => $ip, ':id' => $id]);
     }

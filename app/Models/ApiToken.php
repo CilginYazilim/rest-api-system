@@ -38,6 +38,12 @@ final class ApiToken
         public readonly array   $scopes,
         public readonly ?string $lastUsedAt = null,
         public readonly string  $lastUsedIp = '',
+
+        /* ÖMÜR BOYU istek sayısı. api_requests tablosundan DEĞİL, bu
+         * alandan okunur — o tablo yalnızca hız sınırının kayan
+         * penceresidir ve 1 saat sonra budanır (bkz. ApiRateLimiter). */
+        public readonly int     $requestCount = 0,
+
         public readonly ?string $revokedAt = null,
         public readonly ?string $createdAt = null,
     ) {
@@ -55,9 +61,10 @@ final class ApiToken
              * array_filter bu hayalet yetkiyi temizler. */
             scopes:     array_values(array_filter(explode(',', (string) ($row['scopes'] ?? '')))),
 
-            lastUsedAt: isset($row['last_used_at']) ? (string) $row['last_used_at'] : null,
-            lastUsedIp: (string) ($row['last_used_ip'] ?? ''),
-            revokedAt:  isset($row['revoked_at']) ? (string) $row['revoked_at'] : null,
+            lastUsedAt:   isset($row['last_used_at']) ? (string) $row['last_used_at'] : null,
+            lastUsedIp:   (string) ($row['last_used_ip'] ?? ''),
+            requestCount: (int) ($row['request_count'] ?? 0),
+            revokedAt:    isset($row['revoked_at']) ? (string) $row['revoked_at'] : null,
             createdAt:  isset($row['created_at']) ? (string) $row['created_at'] : null,
         );
     }
@@ -85,8 +92,9 @@ final class ApiToken
             'id'           => $this->id,
             'name'         => $this->name,
             'scopes'       => $this->scopes,
-            'last_used_at' => $this->lastUsedAt,
-            'revoked'      => $this->isRevoked(),
+            'last_used_at'  => $this->lastUsedAt,
+            'request_count' => $this->requestCount,
+            'revoked'       => $this->isRevoked(),
             'created_at'   => $this->createdAt,
         ];
     }

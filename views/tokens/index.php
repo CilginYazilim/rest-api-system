@@ -125,6 +125,7 @@ use App\Core\View;
                     <tr>
                         <th scope="col">Ad</th>
                         <th scope="col" class="cy-hide-sm">Yetkiler</th>
+                        <th scope="col" class="cy-hide-sm text-end">İstek</th>
                         <th scope="col" class="cy-hide-sm">Son Kullanım</th>
                         <th scope="col">Durum</th>
                         <th scope="col" class="text-end">İşlem</th>
@@ -133,7 +134,7 @@ use App\Core\View;
                 <tbody>
                     <?php if ($tokens === []): ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="6" class="text-center py-5 text-muted">
                                 Henüz jeton üretmediniz.
                             </td>
                         </tr>
@@ -146,6 +147,7 @@ use App\Core\View;
                                     <span class="cy-user-cell__name"><?= e($token->name) ?></span>
                                     <span class="cy-user-cell__meta">
                                         <?= e(implode(' · ', $token->scopes)) ?> ·
+                                        <?= number_format($token->requestCount, 0, ',', '.') ?> istek ·
                                         <?= e(human_date($token->createdAt)) ?>
                                     </span>
                                 </div>
@@ -155,6 +157,14 @@ use App\Core\View;
                                 <?php foreach ($token->scopes as $scope): ?>
                                     <span class="cy-badge cy-badge--brand"><?= e($scope) ?></span>
                                 <?php endforeach; ?>
+                            </td>
+
+                            <td class="cy-hide-sm text-end">
+                                <?php /* Ömür boyu toplam. api_requests'ten DEĞİL,
+                                         api_tokens.request_count'tan gelir: o tablo
+                                         yalnızca hız sınırının kayan penceresidir ve
+                                         1 saat sonra budanır (bkz. ApiRateLimiter). */ ?>
+                                <?= number_format($token->requestCount, 0, ',', '.') ?>
                             </td>
 
                             <td class="cy-hide-sm">
@@ -189,6 +199,7 @@ use App\Core\View;
                                         data-ad="<?= e($token->name, 'attr') ?>"
                                         data-id="<?= (int) $token->id ?>"
                                         data-kapsam="<?= e(implode(' · ', $token->scopes), 'attr') ?>"
+                                        data-istek="<?= e(number_format($token->requestCount, 0, ',', '.'), 'attr') ?>"
                                         data-olusturma="<?= e((string) $token->createdAt, 'attr') ?>"
                                         data-kullanim="<?= e($token->lastUsedAt === null ? 'Hiç kullanılmadı' : (string) $token->lastUsedAt, 'attr') ?>"
                                         data-ip="<?= e($token->lastUsedIp === '' ? '—' : $token->lastUsedIp, 'attr') ?>"
@@ -268,6 +279,7 @@ use App\Core\View;
                     <tr><td>Ad</td><td id="jd_ad" class="text-muted"></td></tr>
                     <tr><td>Numara</td><td id="jd_id" class="text-muted"></td></tr>
                     <tr><td>Yetkiler</td><td id="jd_kapsam" class="text-muted"></td></tr>
+                    <tr><td>Toplam istek</td><td id="jd_istek" class="text-muted"></td></tr>
                     <tr><td>Oluşturma</td><td id="jd_olusturma" class="text-muted"></td></tr>
                     <tr><td>Son kullanım</td><td id="jd_kullanim" class="text-muted"></td></tr>
                     <tr><td>Son IP</td><td id="jd_ip" class="text-muted"></td></tr>

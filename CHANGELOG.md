@@ -25,6 +25,26 @@ kurallarına uyar.
 - Kullanıcılar sayfasında filtreler **"Uygula"ya basmadan** çalışır:
   açılır listeler anında, arama kutusu 450 ms beklemeyle. JavaScript
   kapalıysa düğme görünür kalır ve form normal gönderilir.
+- Jeton başına **ömür boyu istek sayacı** (`api_tokens.request_count`).
+  Jeton listesinde yeni bir sütun ve Detaylar modalında görünür; mobilde
+  ad hücresinin altındaki özet satırına da eklendi.
+  `ApiTokenRepository::touch()` içinde `request_count = request_count + 1`
+  ile **atomik** artırılır — iki isteğin aynı anda "önce oku sonra yaz"
+  yapıp birbirini ezmesi riski yok.
+
+  **`api_requests`'ten DEĞİL bu sütundan okunur.** O tablo yalnızca hız
+  sınırının kayan penceresidir; `ApiRateLimiter::prune()` satırları bir
+  saat sonra siler. Oradan `COUNT(*)` ile toplam üretmeye çalışmak,
+  zamanla küçülen ve yanlış bir sayı verirdi.
+
+  > **Var olan bir kurulumu yükseltiyorsanız:** proje ayrı bir migration
+  > aracı kullanmaz, `database.sql` yalnızca ilk kuruluş içindir. Sütunu
+  > elle eklemeniz gerekir:
+  > ```sql
+  > ALTER TABLE api_tokens
+  >   ADD COLUMN request_count INT UNSIGNED NOT NULL DEFAULT 0
+  >   AFTER last_used_ip;
+  > ```
 
 ### Düzeltildi
 
