@@ -59,7 +59,7 @@
 | **2** | Jetonu kopyalayıp `curl` ile bir istek atın | `curl -H "Authorization: Bearer <jeton>" .../api/v1/users` — JSON döner |
 | **3** | Yanıtın `meta` bölümüne bakın | Toplam kayıt, sayfa, sayfa boyutu ve toplam sayfa sayısı orada. İstemcinin sayfalamayı tahmin etmesi gerekmez |
 | **4** | `links` bölümüne bakın | Bir sonraki sayfanın **tam adresi** hazır gelir. İstemci adres kurmaz, takip eder |
-| **5** | `?per=200` deneyin | Sayfa boyutu **tavanlanır**. Aksi hâlde tek istekle tüm tabloyu çekmek mümkün olurdu |
+| **5** | `?per=200` deneyin | 200 listede olmadığı için istek **20'ye düşer**. Sayfa boyutu bir **beyaz listedir**; aksi hâlde tek istekle tüm tabloyu çekmek mümkün olurdu |
 | **6** | Sadece `read` kapsamlı jetonla **POST** atmayı deneyin | `403` ve `insufficient_scope` döner. Kapsam kontrolü rotanın **ara katmanında** yapılır, denetleyicinin içinde unutulabilecek bir `if` değildir |
 | **7** | Yanıt başlıklarına bakın (`curl -i`) | `X-RateLimit-Limit`, `X-RateLimit-Remaining` ve `X-RateLimit-Reset` gelir. İstemci sınıra çarpmadan önce yavaşlayabilir |
 | **8** | Aynı jetonla 60'tan fazla istek atın | `429` ve `Retry-After` başlığı döner. Sayım **jeton başına** yapılır; başkasının trafiği sizi engellemez |
@@ -268,7 +268,7 @@ Satır silinseydi ona bağlı `api_requests` kayıtları da giderdi (`ON DELETE 
 
 Doğrulama `revoked_at IS NULL` koşulunu arar; iptal edilmiş jeton anında geçersizdir.
 
-### 5. Sayfa boyutu tavanlanır
+### 5. Sayfa boyutu beyaz listeden geçer
 
 ```php
 public const PER_PAGE_OPTIONS = [10, 20, 50, 100];
@@ -277,7 +277,15 @@ public const DEFAULT_PER_PAGE = 20;
 
 `?per=100000` yazan bir istemci — çoğu zaman kötü niyetle değil, dikkatsizlikle — tek istekte tüm tabloyu ister. Bu, sunucunun belleğini de yanıtın boyutunu da patlatır.
 
-Tavan bir güvenlik önlemidir; istemcinin iyi niyetine bırakılmaz.
+**Bu bir tavan değil, beyaz listedir** ve fark önemlidir. Tavan olsaydı `per=100000` sessizce 100'e çekilirdi; istemci yanlış yazdığını hiç fark etmezdi. Beyaz listede, listede olmayan HER değer varsayılana (`20`) döner:
+
+| İstenen | Dönen |
+|---|---|
+| `10` · `20` · `50` · `100` | aynısı |
+| `3` | `20` — küçük değerler de listede değil |
+| `250` · `100000` · `abc` | `20` |
+
+Tek satırlık bir `in_array` kontrolü, "acaba bu sayı çok mu büyük?" diye düşünmek zorunda kalmadan bütün uç durumları kapatır. İstemcinin iyi niyetine bırakılmaz.
 
 ### 6. Yanıt zarfı: `data` + `meta` + `links`
 
@@ -317,7 +325,7 @@ Bu yüzden `http_response_code()` **başlıklardan sonra** çağrılır. (Aynı 
 - Bearer jeton doğrulama
 - Kapsam: `read` / `write`, rota düzeyinde
 - Jeton başına hız sınırı + üç bilgi başlığı
-- Sayfalama: `meta` + `links`, tavanlı `per`
+- Sayfalama: `meta` + `links`, beyaz listeli `per`
 - Tutarlı hata zarfı (`code` · `message` · `details`)
 - Doğru HTTP kodları: 200 · 201 · 204 · 400 · 401 · 403 · 404 · 405 · 422 · 429
 - `201` ile birlikte `Location` başlığı
@@ -361,7 +369,7 @@ Bütün uç noktalar `Authorization: Bearer <jeton>` başlığı ister.
 | Ad | Tip | Varsayılan | Açıklama |
 |---|---|---|---|
 | `page` | int | `1` | Sayfa numarası |
-| `per` | int | `20` | Sayfa boyutu — `10, 20, 50, 100` ile **tavanlanır** |
+| `per` | int | `20` | Sayfa boyutu. Yalnızca `10, 20, 50, 100` kabul edilir; **başka her değer `20`'ye döner** |
 
 **Örnek**
 
@@ -503,7 +511,7 @@ curl -X DELETE -H "Authorization: Bearer cy_..." \
 | **İptal edilemeyen anahtar** | Süresiz JWT | Jeton sunucuda tutulur; `revoked_at` ile **anında** geçersiz olur |
 | **Zamanlama saldırısı** | `if ($hash == $gelen)` | Aramanın kendisi özet üzerinden yapılır; eşitlik karşılaştırmaları `hash_equals()` ile |
 | **SQL enjeksiyonu** | `"... WHERE id = $id"` | Tüm sorgular hazır ifade; `ATTR_EMULATE_PREPARES = false` |
-| **Aşırı veri çekme** | `?per=100000` | Sayfa boyutu **tavanlanır** |
+| **Aşırı veri çekme** | `?per=100000` | Sayfa boyutu **beyaz listeden** geçer; liste dışı değer `20`'ye döner |
 | **Kaynak tüketimi** | Sınırsız istek | Jeton başına hız sınırı + `429` + `Retry-After` |
 | **Hata sızıntısı** | İstisna mesajını JSON'a basmak | `500` yanıtı ayrıntı taşımaz; ayrıntı log'a yazılır |
 | **Yanlış durum kodu** | `WWW-Authenticate`'ten sonra `403` denemek | `http_response_code()` **başlıklardan sonra** çağrılır |
@@ -574,7 +582,7 @@ API davranışını belirleyen değerler koddadır:
 | hız sınırı | `ApiRateLimiter::__construct` | `60` | Pencere içinde izin verilen istek |
 | pencere | `ApiRateLimiter::__construct` | `60` sn | Sayım penceresi |
 | sayfa boyutu | `Paginator::DEFAULT_PER_PAGE` | `20` | `per` verilmezse |
-| tavan | `Paginator::PER_PAGE_OPTIONS` | `100` | En büyük `per` değeri |
+| izin verilen sayfa boyutları | `Paginator::PER_PAGE_OPTIONS` | `10, 20, 50, 100` | Liste dışı her değer `DEFAULT_PER_PAGE`'e döner |
 | kapsamlar | `ApiToken::SCOPES` | `read`, `write` | Tanımlı kapsam listesi |
 
 ---
@@ -593,7 +601,7 @@ rest-api-system/
 │   │   ├── ApiAuth.php            ★ Bearer doğrulama · requireScope()
 │   │   ├── ApiRateLimiter.php     ★ Jeton başına sayım · X-RateLimit-* başlıkları
 │   │   ├── ApiResponse.php        ★ data/meta/links zarfı · hata zarfı · HTTP kodları
-│   │   ├── Paginator.php          Sayfalama ve tavan
+│   │   ├── Paginator.php          Sayfalama ve beyaz liste
 │   │   ├── Middleware.php         'api' ve 'scope:read|write' ara katmanları
 │   │   ├── Auth.php · Session.php · Csrf.php · RateLimiter.php
 │   │   ├── Database.php           PDO (EMULATE_PREPARES = false)
@@ -658,7 +666,7 @@ Rota bulundu: ['api', 'scope:read']
    │
    ▼
 UserApiController::index()
-   │   Paginator: per tavanlanır (en fazla 100)
+   │   Paginator: per beyaz listeden gecer (10/20/50/100)
    │   UserRepository::page($offset, $limit)
    ▼
 ApiResponse::collection($items, $paginator, 'api/v1/users')

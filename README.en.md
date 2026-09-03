@@ -59,7 +59,7 @@
 | **2** | Copy the token and make a request with `curl` | `curl -H "Authorization: Bearer <token>" .../api/v1/users` — JSON comes back |
 | **3** | Look at the `meta` block in the response | Total records, page, page size and total page count. The client never has to guess the pagination |
 | **4** | Look at the `links` block | The **full URL** of the next page arrives ready-made. The client follows rather than builds |
-| **5** | Try `?per=200` | The page size is **capped**. Otherwise a single request could pull the whole table |
+| **5** | Try `?per=200` | 200 is not on the list, so the request **falls back to 20**. Page size is an **allow-list**; otherwise a single request could pull the whole table |
 | **6** | Try a **POST** with a `read`-only token | `403` and `insufficient_scope`. The scope check lives in the route's **middleware**, not in an `if` that a controller can forget |
 | **7** | Look at the response headers (`curl -i`) | `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` are sent. A client can slow down *before* hitting the wall |
 | **8** | Make more than 60 requests with the same token | `429` and a `Retry-After` header. Counting is **per token**; nobody else's traffic can block you |
@@ -268,7 +268,7 @@ Deleting the row would take its `api_requests` records with it (`ON DELETE CASCA
 
 Verification requires `revoked_at IS NULL`; a revoked token is invalid immediately.
 
-### 5. Page size is capped
+### 5. Page size goes through an allow-list
 
 ```php
 public const PER_PAGE_OPTIONS = [10, 20, 50, 100];
@@ -277,7 +277,15 @@ public const DEFAULT_PER_PAGE = 20;
 
 A client writing `?per=100000` — usually carelessly rather than maliciously — asks for the whole table in one request. That blows up both server memory and response size.
 
-The cap is a security control; it isn't left to the client's good intentions.
+**This is an allow-list, not a cap** — and the difference matters. A cap would silently clamp `per=100000` down to 100, and the client would never notice the typo. With an allow-list, *every* value outside the list falls back to the default (`20`):
+
+| Requested | Returned |
+|---|---|
+| `10` · `20` · `50` · `100` | the same |
+| `3` | `20` — small values aren't on the list either |
+| `250` · `100000` · `abc` | `20` |
+
+A single `in_array` check closes every edge case without anyone having to reason about "is this number too large?". It isn't left to the client's good intentions.
 
 ### 6. The response envelope: `data` + `meta` + `links`
 
@@ -317,7 +325,7 @@ That's why `http_response_code()` is called **after** the headers. (The same beh
 - Bearer token authentication
 - Scopes: `read` / `write`, at route level
 - Per-token rate limiting + three informational headers
-- Pagination: `meta` + `links`, capped `per`
+- Pagination: `meta` + `links`, allow-listed `per`
 - Consistent error envelope (`code` · `message` · `details`)
 - Correct HTTP codes: 200 · 201 · 204 · 400 · 401 · 403 · 404 · 405 · 422 · 429
 - A `Location` header alongside `201`
@@ -361,7 +369,7 @@ Every endpoint requires an `Authorization: Bearer <token>` header.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `page` | int | `1` | Page number |
-| `per` | int | `20` | Page size — **capped** by `10, 20, 50, 100` |
+| `per` | int | `20` | Page size. Only `10, 20, 50, 100` are accepted; **any other value falls back to `20`** |
 
 **Example**
 
@@ -503,7 +511,7 @@ curl -X DELETE -H "Authorization: Bearer cy_..." \
 | **Unrevocable keys** | Long-lived JWTs | The token lives on the server; `revoked_at` invalidates it **instantly** |
 | **Timing attacks** | `if ($hash == $incoming)` | Lookup happens by digest; equality comparisons use `hash_equals()` |
 | **SQL injection** | `"... WHERE id = $id"` | All queries are prepared statements; `ATTR_EMULATE_PREPARES = false` |
-| **Excessive data extraction** | `?per=100000` | The page size is **capped** |
+| **Excessive data extraction** | `?per=100000` | Page size goes through an **allow-list**; anything off the list falls back to `20` |
 | **Resource exhaustion** | Unlimited requests | Per-token rate limiting + `429` + `Retry-After` |
 | **Error leakage** | Dumping the exception message into JSON | The `500` response carries no details; they go to the log |
 | **Wrong status code** | Trying `403` after `WWW-Authenticate` | `http_response_code()` is called **after** the headers |
@@ -574,7 +582,7 @@ The values that shape API behaviour live in code:
 | rate limit | `ApiRateLimiter::__construct` | `60` | Requests allowed per window |
 | window | `ApiRateLimiter::__construct` | `60` s | The counting window |
 | page size | `Paginator::DEFAULT_PER_PAGE` | `20` | When `per` isn't given |
-| cap | `Paginator::PER_PAGE_OPTIONS` | `100` | The largest allowed `per` |
+| allowed page sizes | `Paginator::PER_PAGE_OPTIONS` | `10, 20, 50, 100` | Anything off the list falls back to `DEFAULT_PER_PAGE` |
 | scopes | `ApiToken::SCOPES` | `read`, `write` | The defined scope list |
 
 ---
@@ -658,7 +666,7 @@ Route matched: ['api', 'scope:read']
    │
    ▼
 UserApiController::index()
-   │   Paginator: per is capped (100 max)
+   │   Paginator: per goes through allow-list (10/20/50/100)
    │   UserRepository::page($offset, $limit)
    ▼
 ApiResponse::collection($items, $paginator, 'api/v1/users')

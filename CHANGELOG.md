@@ -53,6 +53,20 @@ kurallarına uyar.
 
 ### Düzeltildi
 
+- README'lerde `per` parametresi **yanlış anlatılıyordu**. Dokuz ayrı yerde
+  "tavanlanır" deniyordu; oysa `Paginator::perPageFromRequest()` bir
+  **beyaz liste** uygular. Tavan olsaydı `per=100000` → `100` olurdu;
+  gerçekte `20`'ye döner. Küçük değerler de listede değildir: `per=3` de
+  `20` verir. Ölçülen davranış:
+
+  | İstenen | Dönen |
+  |---|---|
+  | `10` · `20` · `50` · `100` | aynısı |
+  | `3` · `250` · `100000` · `abc` | `20` |
+
+  Kodun kendi yorumları ve uygulama içindeki API belgeleri sayfası
+  zaten doğruydu; kayan yalnızca README'lerdi.
+
 - **Örnek Kullanım** kodlarındaki yazma çağrıları (`POST`/`PATCH`/`DELETE`)
   varsayılan olarak **yorum satırına alındı**. Dört dilin örneği de dosyayı
   olduğu gibi çalıştıran birine 5 gerçek istek attırıyordu (listele + tek
