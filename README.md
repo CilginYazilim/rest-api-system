@@ -532,14 +532,17 @@ Açın: `http://localhost/rest-api-system/` · Giriş: `admin@cilginyazilim.com`
 Sonra **API Jetonları** sayfasından kendi jetonunuzu üretin.
 
 > **Apache'de `Authorization` başlığı kaybolabilir.** Apache, CGI/FastCGI modunda bu başlığı güvenlik gerekçesiyle PHP'ye geçirmez; sonuç, jeton doğru olsa bile her isteğin `401` dönmesidir. Proje `.htaccess` dosyası başlığı bir ortam değişkenine kopyalayarak bunu çözer:
-> ```apache
-> RewriteCond %{HTTP:Authorization} .
-> RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-> ```
-> PHP bunu `$_SERVER['HTTP_AUTHORIZATION']` olarak görür. Nginx + PHP-FPM kullanıyorsanız karşılığı:
-> ```nginx
-> fastcgi_param HTTP_AUTHORIZATION $http_authorization;
-> ```
+
+```apache
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+```
+
+PHP bunu `$_SERVER['HTTP_AUTHORIZATION']` olarak görür. Nginx + PHP-FPM kullanıyorsanız karşılığı:
+
+```nginx
+fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+```
 
 ---
 

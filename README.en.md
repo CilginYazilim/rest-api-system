@@ -532,14 +532,17 @@ Open `http://localhost/rest-api-system/` · Log in with `admin@cilginyazilim.com
 Then generate your own token from the **API Tokens** page.
 
 > **Apache may drop the `Authorization` header.** In CGI/FastCGI mode Apache withholds it from PHP for security reasons; the result is that every request returns `401` even with a correct token. The project's `.htaccess` solves this by copying the header into an environment variable:
-> ```apache
-> RewriteCond %{HTTP:Authorization} .
-> RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-> ```
-> PHP then sees it as `$_SERVER['HTTP_AUTHORIZATION']`. On Nginx + PHP-FPM the equivalent is:
-> ```nginx
-> fastcgi_param HTTP_AUTHORIZATION $http_authorization;
-> ```
+
+```apache
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+```
+
+PHP then sees it as `$_SERVER['HTTP_AUTHORIZATION']`. On Nginx + PHP-FPM the equivalent is:
+
+```nginx
+fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+```
 
 ---
 
