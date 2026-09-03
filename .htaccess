@@ -34,6 +34,28 @@ DirectoryIndex index.php
     </IfModule>
 </FilesMatch>
 
+# ---------------------------------------------------------------------
+#  README İSTİSNASI
+# ---------------------------------------------------------------------
+#  Yukarıdaki kural bütün ".md" dosyalarını kapatır. Ama README, bu
+#  örneğin ANLATIMIDIR: Çılgın Yazılım Kütüphanesi vitrini demo
+#  klasöründeki README.md dosyasını okuyup içerik olarak yayınlar.
+#  Kapalı kalırsa örnek, vitrinde açıklamasız görünür.
+#
+#  Yalnızca README dosyaları açılıyor; CHANGELOG.md dahil diğer bütün
+#  ".md" dosyaları kapalı kalmaya devam ediyor. İki harflik dil ekine
+#  izin veren desen, README.en.md dosyasını da kapsar.
+# ---------------------------------------------------------------------
+<FilesMatch "^README(\.[a-z]{2})?\.md$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+</FilesMatch>
+
 # Nokta ile başlayan tüm dosyalar (.git, .env, .htpasswd …)
 <FilesMatch "^\.">
     <IfModule mod_authz_core.c>
