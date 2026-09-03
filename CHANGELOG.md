@@ -48,6 +48,16 @@ kurallarına uyar.
 
 ### Düzeltildi
 
+- **Örnek Kullanım** kodlarındaki yazma çağrıları (`POST`/`PATCH`/`DELETE`)
+  varsayılan olarak **yorum satırına alındı**. Dört dilin örneği de dosyayı
+  olduğu gibi çalıştıran birine 5 gerçek istek attırıyordu (listele + tek
+  kayıt + oluştur + güncelle + sil) — ömür boyu istek sayacı her çalıştırmada
+  5 artıyordu ve ikinci çalıştırmada `POST` `409 email_taken`, `DELETE`
+  `404 not_found` dönüyordu (ilk çalıştırma zaten o e-postayı almış ve o
+  kaydı silmişti). Artık yalnızca **okuma** çağrıları (listele, tek kayıt)
+  otomatik çalışır; yazma örnekleri kod olarak duruyor, denemek isteyen
+  yorum işaretini kendisi kaldırır.
+
 - **Örnek Kullanım** kodlarındaki PHP/JS/Python uyarısı: `meta.total_pages`
   diye bir alan hiç var olmadı. Gerçek API yanıtı `total`, `per_page`,
   `current_page`, `last_page`, `from`, `to`, `has_more` alanlarını taşır

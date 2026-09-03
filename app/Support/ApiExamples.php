@@ -146,26 +146,28 @@ final class ApiExamples
             curl -s "\${AUTH[@]}" "\$BASE/users/11"
 
             # -----------------------------------------------------------------
-            # 3) OLUSTUR  (kapsam: write)  ->  201 + Location basligi
+            # 3-5) YAZMA ORNEKLERI  (kapsam: write)  ->  VARSAYILAN KAPALI
             # -----------------------------------------------------------------
-            curl -s -X POST "\${AUTH[@]}" \\
-                 -H "Content-Type: application/json" \\
-                 -d '{"name":"Ayse","surname":"Yilmaz","email":"ayse@ornek.com","password":"Gizli1234"}' \\
-                 "\$BASE/users"
-
-            # -----------------------------------------------------------------
-            # 4) KISMI GUNCELLE  (kapsam: write)
-            #    Yalnizca gonderdiginiz alanlar degisir.
-            # -----------------------------------------------------------------
-            curl -s -X PATCH "\${AUTH[@]}" \\
-                 -H "Content-Type: application/json" \\
-                 -d '{"is_active":false}' \\
-                 "\$BASE/users/11"
-
-            # -----------------------------------------------------------------
-            # 5) SIL  (kapsam: write)  ->  204, govde yok
-            # -----------------------------------------------------------------
-            curl -s -X DELETE "\${AUTH[@]}" "\$BASE/users/52"
+            #  Asagidaki satirlar YORUMDA: dosyayi oldugu gibi calistirirsaniz
+            #  yalnizca yukaridaki LISTELE ve TEK KAYIT (read) calisir.
+            #
+            #  NEDEN KAPALI? POST/PATCH/DELETE GERCEKTEN veri degistirir.
+            #  Dosyayi ikinci kez calistirirsaniz:
+            #    - POST   -> 409 email_taken  (e-posta bir onceki calistirmada alindi)
+            #    - DELETE -> 404 not_found    (kayit bir onceki calistirmada silindi)
+            #  Denemek icin asagidaki satirlarin basindaki "# " isaretini kaldirin.
+            #
+            # curl -s -X POST "\${AUTH[@]}" \
+            #      -H "Content-Type: application/json" \
+            #      -d '{"name":"Ayse","surname":"Yilmaz","email":"ayse@ornek.com","password":"Gizli1234"}' \
+            #      "\$BASE/users"
+            #
+            # curl -s -X PATCH "\${AUTH[@]}" \
+            #      -H "Content-Type: application/json" \
+            #      -d '{"is_active":false}' \
+            #      "\$BASE/users/11"
+            #
+            # curl -s -X DELETE "\${AUTH[@]}" "\$BASE/users/52"
 
             # -----------------------------------------------------------------
             # 6) HIZ SINIRI
@@ -250,27 +252,26 @@ final class ApiExamples
             \$cevap = api('GET', '/users/11');
 
             // -----------------------------------------------------------------
-            // 3) OLUSTUR  (kapsam: write)  ->  201
+            // 3-5) YAZMA ORNEKLERI  (kapsam: write)  ->  VARSAYILAN KAPALI
             // -----------------------------------------------------------------
-            \$cevap = api('POST', '/users', [
-                'name'     => 'Ayse',
-                'surname'  => 'Yilmaz',
-                'email'    => 'ayse@ornek.com',
-                'password' => 'Gizli1234',
-            ]);
-
-            // Dogrulama hatasi ALAN BAZLIDIR: hangi kutuyu kirmizi yapacaginizi bilirsiniz.
-            if (\$cevap['durum'] === 422) {
-                foreach (\$cevap['govde']['error']['details'] as \$alan => \$mesajlar) {
-                    printf("%s: %s\\n", \$alan, implode(' ', (array) \$mesajlar));
-                }
-            }
-
-            // -----------------------------------------------------------------
-            // 4) KISMI GUNCELLE / 5) SIL  (kapsam: write)
-            // -----------------------------------------------------------------
-            \$cevap = api('PATCH', '/users/11', ['is_active' => false]);
-            \$cevap = api('DELETE', '/users/52');   // 204, govde yok
+            //  Asagidaki satirlar YORUMDA: dosyayi oldugu gibi calistirirsaniz
+            //  yalnizca yukaridaki LISTELE ve TEK KAYIT (read) calisir.
+            //
+            //  NEDEN KAPALI? POST/PATCH/DELETE GERCEKTEN veri degistirir.
+            //  Dosyayi ikinci kez calistirirsaniz:
+            //    - POST   -> 409 email_taken  (e-posta bir onceki calistirmada alindi)
+            //    - DELETE -> 404 not_found    (kayit bir onceki calistirmada silindi)
+            //  Denemek icin asagidaki satirlarin basindaki "// " isaretini kaldirin.
+            //
+            // \$cevap = api('POST', '/users', [
+            //     'name'     => 'Ayse',
+            //     'surname'  => 'Yilmaz',
+            //     'email'    => 'ayse@ornek.com',
+            //     'password' => 'Gizli1234',
+            // ]);
+            //
+            // \$cevap = api('PATCH', '/users/11', ['is_active' => false]);
+            // \$cevap = api('DELETE', '/users/52');   // 204, govde yok
 
             // -----------------------------------------------------------------
             //  SIK KARSILASILAN DURUMLAR
@@ -342,27 +343,26 @@ final class ApiExamples
                 await api('GET', '/users/11');
 
                 // -------------------------------------------------------------
-                // 3) OLUSTUR  (kapsam: write)  ->  201
+                // 3-5) YAZMA ORNEKLERI  (kapsam: write)  ->  VARSAYILAN KAPALI
                 // -------------------------------------------------------------
-                const olustur = await api('POST', '/users', {
-                    name: 'Ayse',
-                    surname: 'Yilmaz',
-                    email: 'ayse@ornek.com',
-                    password: 'Gizli1234',
-                });
-
-                // Dogrulama hatasi ALAN BAZLIDIR.
-                if (olustur.durum === 422) {
-                    Object.entries(olustur.govde.error.details).forEach(([alan, mesajlar]) => {
-                        console.warn(alan, [].concat(mesajlar).join(' '));
-                    });
-                }
-
-                // -------------------------------------------------------------
-                // 4) KISMI GUNCELLE / 5) SIL  (kapsam: write)
-                // -------------------------------------------------------------
-                await api('PATCH', '/users/11', { is_active: false });
-                await api('DELETE', '/users/52');   // 204, govde yok
+                //  Asagidaki satirlar YORUMDA: dosyayi oldugu gibi calistirirsaniz
+                //  yalnizca yukaridaki LISTELE ve TEK KAYIT (read) calisir.
+                //
+                //  NEDEN KAPALI? POST/PATCH/DELETE GERCEKTEN veri degistirir.
+                //  Dosyayi ikinci kez calistirirsaniz:
+                //    - POST   -> 409 email_taken  (e-posta bir onceki calistirmada alindi)
+                //    - DELETE -> 404 not_found    (kayit bir onceki calistirmada silindi)
+                //  Denemek icin asagidaki satirlarin basindaki "// " isaretini kaldirin.
+                //
+                // const olustur = await api('POST', '/users', {
+                //     name: 'Ayse',
+                //     surname: 'Yilmaz',
+                //     email: 'ayse@ornek.com',
+                //     password: 'Gizli1234',
+                // });
+                //
+                // await api('PATCH', '/users/11', { is_active: false });
+                // await api('DELETE', '/users/52');   // 204, govde yok
             })();
 
             /* -----------------------------------------------------------------
@@ -424,25 +424,26 @@ final class ApiExamples
             durum, govde = api("GET", "/users/11")
 
             # -----------------------------------------------------------------
-            # 3) OLUSTUR  (kapsam: write)  ->  201
+            # 3-5) YAZMA ORNEKLERI  (kapsam: write)  ->  VARSAYILAN KAPALI
             # -----------------------------------------------------------------
-            durum, govde = api("POST", "/users", {
-                "name": "Ayse",
-                "surname": "Yilmaz",
-                "email": "ayse@ornek.com",
-                "password": "Gizli1234",
-            })
-
-            # Dogrulama hatasi ALAN BAZLIDIR.
-            if durum == 422:
-                for alan, mesajlar in govde["error"]["details"].items():
-                    print(alan, " ".join(mesajlar if isinstance(mesajlar, list) else [mesajlar]))
-
-            # -----------------------------------------------------------------
-            # 4) KISMI GUNCELLE / 5) SIL  (kapsam: write)
-            # -----------------------------------------------------------------
-            durum, govde = api("PATCH", "/users/11", {"is_active": False})
-            durum, govde = api("DELETE", "/users/52")   # 204, govde yok
+            #  Asagidaki satirlar YORUMDA: dosyayi oldugu gibi calistirirsaniz
+            #  yalnizca yukaridaki LISTELE ve TEK KAYIT (read) calisir.
+            #
+            #  NEDEN KAPALI? POST/PATCH/DELETE GERCEKTEN veri degistirir.
+            #  Dosyayi ikinci kez calistirirsaniz:
+            #    - POST   -> 409 email_taken  (e-posta bir onceki calistirmada alindi)
+            #    - DELETE -> 404 not_found    (kayit bir onceki calistirmada silindi)
+            #  Denemek icin asagidaki satirlarin basindaki "# " isaretini kaldirin.
+            #
+            # durum, govde = api("POST", "/users", {
+            #     "name": "Ayse",
+            #     "surname": "Yilmaz",
+            #     "email": "ayse@ornek.com",
+            #     "password": "Gizli1234",
+            # })
+            #
+            # durum, govde = api("PATCH", "/users/11", {"is_active": False})
+            # durum, govde = api("DELETE", "/users/52")   # 204, govde yok
 
             # -----------------------------------------------------------------
             #  SIK KARSILASILAN DURUMLAR
