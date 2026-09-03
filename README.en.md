@@ -65,6 +65,7 @@
 | **8** | Make more than 60 requests with the same token | `429` and a `Retry-After` header. Counting is **per token**; nobody else's traffic can block you |
 | **9** | Press **"Revoke"** on the token, then make another request | `401`. The token isn't deleted — `revoked_at` is filled in, so past request records stay linked and "what did this token do?" remains answerable |
 | **10** | Open the **API Docs** page | Every endpoint, its scope, the error codes and copy-pasteable `curl` examples |
+| **11** | Pick your language in the **Example Usage** section on the same page | The cURL, PHP, JavaScript and Python snippets are printed with **this server's real address**. **Download** hands you a working file; no token is written into it, only a placeholder |
 
 > **Tip:** Errors are structured too: every error has a machine-readable `code` (`invalid_token`, `insufficient_scope`, `validation_failed`, `rate_limit_exceeded`) and a human-readable `message`.
 
@@ -328,6 +329,8 @@ That's why `http_response_code()` is called **after** the headers. (The same beh
 - Last-used timestamp and IP
 - Revocation (without deletion)
 - API documentation page with copy-pasteable `curl` examples
+- **Example Usage**: cURL, PHP, JavaScript, Python
+- Downloadable example file (placeholder instead of a token)
 
 **Shared infrastructure**
 
@@ -607,6 +610,7 @@ rest-api-system/
 ├── views/                         Layouts, token and documentation pages
 ├── assets/                        css · js · images
 ├── config/config.php
+│   ├── Support/ApiExamples.php    ★ Builds the example usage snippets
 ├── routes/web.php                 ★ Scopes are declared here
 └── docs/                          index.html · screenshots/
 ```

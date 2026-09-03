@@ -49,6 +49,17 @@ use App\Core\View;
     </div>
 <?php endif; ?>
 
+<?php
+/* ÖRNEK KULLANIM
+   Jeton üretmek yetmiyordu: kullanıcı jetonu alıp "peki şimdi ne
+   yapacağım?" sorusuyla kalıyordu. Çalışır durumdaki örnekler jetonun
+   hemen altında duruyor. Aynı parça API Belgeleri sayfasında da var. */
+View::partial('partials/api_examples', [
+    'ornekler'    => $ornekler ?? [],
+    'ornekGercek' => $ornekGercek ?? false,
+]);
+?>
+
 <!-- ==============================================================
      YENİ JETON ÜRETME
 ============================================================== -->

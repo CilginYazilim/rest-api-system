@@ -6,6 +6,29 @@ kurallarına uyar.
 
 ---
 
+## [Yayınlanmamış]
+
+### Eklendi
+
+- **Örnek Kullanım** bölümü: cURL, PHP, JavaScript ve Python için çalışır
+  durumda örnek kodlar. Hem *API Jetonları* hem *API Belgeleri* sayfasında
+  aynı parçadan basılır. Adres bu sunucunun gerçek adresidir; jeton yeni
+  üretildiyse gerçek jeton, değilse örnek bir değer gösterilir.
+- Örnek dosya indirme (`GET tokens/ornek?dil=…`). İndirilen dosyaya
+  **gerçek jeton yazılmaz**; yerine `BURAYA_JETONUNUZU_YAPISTIRIN` konur.
+- `docs/index.html`: ekran görüntüsü galerisi. `docs/` adresi, dizin
+  listeleme kapalı olduğu için `403` dönüyordu.
+
+### Değişti
+
+- API belgeleri sayfasının adresi `docs` → **`api-belgeleri`**. Diskteki
+  gerçek `docs/` klasörü rotayı gölgeliyordu: temiz adres kuralı, var olan
+  bir klasöre denk gelen isteği `index.php`'ye devretmiyor
+  (`RewriteCond %{REQUEST_FILENAME} !-d`). Sayfaya hiç ulaşılamıyordu.
+- `.htaccess`: `DirectoryIndex`'e `index.html` eklendi.
+
+---
+
 ## [1.0.0] — 2026-09-03
 
 İlk yayın. REST API Sistemi, Çılgın Yazılım Kaynak Kütüphanesi'nde yayınlandı.

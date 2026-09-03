@@ -86,3 +86,90 @@
 .cy-param-table { font-size: .8125rem; margin-top: .5rem; }
 .cy-param-table td { padding: .3rem .5rem; vertical-align: top; }
 .cy-param-table td:first-child { white-space: nowrap; font-family: ui-monospace, monospace; }
+
+/* ==================================================================
+ *  ÖRNEK KULLANIM
+ * ------------------------------------------------------------------
+ *  Dört dil sekmelerle ayrılır. Sekme düğmeleri gerçek <button>'dır:
+ *  klavyeyle gezilebilir ve ekran okuyucu aria-selected sayesinde
+ *  hangisinin açık olduğunu söyler.
+ * ================================================================== */
+.cy-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem;
+    margin-bottom: .75rem;
+    border-bottom: 1px solid var(--cy-border);
+}
+
+.cy-tab {
+    padding: .45rem .85rem;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--cy-text-muted);
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color var(--cy-transition), border-color var(--cy-transition);
+}
+
+.cy-tab:hover { color: var(--cy-text); }
+
+/* Açık sekme RENKLE TEK BAŞINA ayrılmaz; altındaki çizgi ve kalınlaşan
+   yazı, renk körlüğünde de farkı görünür kılar. */
+.cy-tab.is-active {
+    color: var(--cy-accent);
+    border-bottom-color: var(--cy-accent);
+}
+
+.cy-tab:focus-visible {
+    outline: 2px solid var(--cy-accent);
+    outline-offset: -2px;
+    border-radius: var(--cy-radius-sm) var(--cy-radius-sm) 0 0;
+}
+
+.cy-ornek__bar {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    padding: .5rem .7rem;
+    border: 1px solid var(--cy-border);
+    border-bottom: 0;
+    border-radius: var(--cy-radius-sm) var(--cy-radius-sm) 0 0;
+    background: var(--cy-surface-soft);
+}
+
+.cy-ornek__ad {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .8125rem;
+    color: var(--cy-text-soft);
+}
+
+.cy-ornek__spacer { flex: 1; }
+
+/* Kod satırları KIRILMAZ: curl komutunu sarmak okunmaz hale getirir.
+   Blok kendi içinde yatay kaydırılır, sayfa gövdesi kaymaz. */
+.cy-ornek__kod {
+    max-height: 26rem;
+    margin: 0 0 1rem;
+    padding: .85rem;
+    border: 1px solid var(--cy-border);
+    border-radius: 0 0 var(--cy-radius-sm) var(--cy-radius-sm);
+    background: var(--cy-surface-soft);
+    font-size: .8125rem;
+    line-height: 1.6;
+    white-space: pre;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cy-ornek__kod code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+@media (max-width: 575.98px) {
+    .cy-ornek__bar { align-items: stretch; }
+    .cy-ornek__bar .cy-btn { flex: 1; justify-content: center; }
+    .cy-ornek__ad { width: 100%; }
+    .cy-ornek__kod { max-height: 18rem; }
+}

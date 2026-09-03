@@ -65,7 +65,75 @@
     });
 
     /* ---------------------------------------------------------------
-     *  2) İPTAL ONAYI
+     *  2) ÖRNEK KULLANIM SEKMELERİ
+     * ---------------------------------------------------------------
+     *  Dört dil alt alta basılınca sayfa okunmaz hâle geliyordu.
+     *  Paneller sunucuda basılır ve burada yalnızca GÖSTERİLİP
+     *  GİZLENİR: JavaScript çalışmazsa hepsi görünür kalır, hiçbir
+     *  içerik kaybolmaz.
+     * ------------------------------------------------------------- */
+    $(document).on('click', '[data-ornek-sekme]', function () {
+        var anahtar = $(this).data('ornek-sekme');
+
+        $('[data-ornek-sekme]')
+            .removeClass('is-active')
+            .attr('aria-selected', 'false');
+
+        $(this).addClass('is-active').attr('aria-selected', 'true');
+
+        $('[data-ornek-panel]').each(function () {
+            this.hidden = $(this).data('ornek-panel') !== anahtar;
+        });
+    });
+
+    /* ---------------------------------------------------------------
+     *  3) KOD KOPYALA
+     * ---------------------------------------------------------------
+     *  Jeton kutusundaki kopyalama ile aynı iş; tek fark hedefin
+     *  data-kopyala ile verilmesi. İkisi de aynı yedek yolu kullanır.
+     * ------------------------------------------------------------- */
+    $(document).on('click', '[data-kopyala]', function () {
+        var $button = $(this);
+        var metin   = $($button.data('kopyala')).text();
+
+        function bitti() {
+            var eski = $button.text();
+
+            $button.text('Kopyalandı');
+            CY.notify('Örnek kod panoya kopyalandı.', 'success');
+
+            window.setTimeout(function () { $button.text(eski); }, 2000);
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(metin).then(bitti).catch(function () {
+                CY.notify('Kopyalanamadı. Metni elle seçip kopyalayın.', 'warning');
+            });
+
+            return;
+        }
+
+        var alan = document.createElement('textarea');
+
+        alan.value          = metin;
+        alan.style.position = 'fixed';
+        alan.style.opacity  = '0';
+
+        document.body.appendChild(alan);
+        alan.select();
+
+        try {
+            document.execCommand('copy');
+            bitti();
+        } catch (error) {
+            CY.notify('Kopyalanamadı. Metni elle seçip kopyalayın.', 'warning');
+        }
+
+        document.body.removeChild(alan);
+    });
+
+    /* ---------------------------------------------------------------
+     *  4) İPTAL ONAYI
      * ---------------------------------------------------------------
      *  Jeton iptali GERİ ALINAMAZ: o jetonu kullanan uygulamalar
      *  anında erişimini kaybeder. Tek tıkla olmasına izin vermiyoruz.

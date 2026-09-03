@@ -65,6 +65,7 @@
 | **8** | Aynı jetonla 60'tan fazla istek atın | `429` ve `Retry-After` başlığı döner. Sayım **jeton başına** yapılır; başkasının trafiği sizi engellemez |
 | **9** | Jetonun **"İptal et"** düğmesine basın, sonra tekrar istek atın | `401`. Jeton silinmez, `revoked_at` doldurulur — geçmiş istek kayıtları bağlı kaldığı için "hangi jeton ne yaptı" sorusu cevapsız kalmaz |
 | **10** | **API Belgeleri** sayfasını açın | Bütün uç noktalar, kapsamları, hata kodları ve kopyalanabilir `curl` örnekleri orada |
+| **11** | Aynı sayfadaki **Örnek Kullanım** bölümünden dilinizi seçin | cURL, PHP, JavaScript ve Python örnekleri **bu sunucunun gerçek adresiyle** basılır. **İndir** düğmesi çalışır bir dosya verir; içine jeton yazılmaz, yer tutucu konur |
 
 > **İpucu:** Hata yanıtları da düzenlidir: her hatanın makine tarafından okunabilir bir `code` alanı (`invalid_token`, `insufficient_scope`, `validation_failed`, `rate_limit_exceeded`) ve insan tarafından okunabilir bir `message` alanı vardır.
 
@@ -328,6 +329,8 @@ Bu yüzden `http_response_code()` **başlıklardan sonra** çağrılır. (Aynı 
 - Son kullanım tarihi ve IP
 - İptal etme (silmeden)
 - API belgeleri sayfası, kopyalanabilir `curl` örnekleri
+- **Örnek Kullanım**: cURL · PHP · JavaScript · Python
+- Örnek dosyayı indirme (jeton yerine yer tutucu)
 
 **Ortak altyapı**
 
@@ -607,6 +610,7 @@ rest-api-system/
 ├── views/                         Düzenler, jeton ve belge sayfaları
 ├── assets/                        css · js · images
 ├── config/config.php
+│   ├── Support/ApiExamples.php    ★ Örnek kullanım kodlarını üretir
 ├── routes/web.php                 ★ Kapsamlar burada tanımlı
 └── docs/                          index.html · screenshots/
 ```

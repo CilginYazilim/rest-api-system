@@ -10,6 +10,8 @@
  *  @var array<int,array<string,mixed>>  $endpoints
  * =====================================================================
  */
+
+use App\Core\View;
 ?>
 
 <!-- ==============================================================
@@ -169,3 +171,12 @@
         </div>
     </div>
 </div>
+
+<?php
+/* ÖRNEK KULLANIM — jeton sayfasıyla AYNI parça.
+   Belgeler ile örnek kod ayrı yerlerde dursaydı biri güncellenip
+   diğeri eskirdi. */
+View::partial('partials/api_examples', [
+    'ornekler'    => $ornekler ?? [],
+    'ornekGercek' => false,
+]);

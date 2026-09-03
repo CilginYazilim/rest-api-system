@@ -22,6 +22,7 @@ use App\Core\Request;
 use App\Core\Router;
 use App\Core\Session;
 use App\Http\Controller;
+use App\Support\ApiExamples;
 
 final class ApiDocController extends Controller
 {
@@ -39,6 +40,9 @@ final class ApiDocController extends Controller
             'subtitle'  => 'Sürüm v1',
             'baseUrl'   => $base,
             'endpoints' => self::endpoints(),
+
+            // Örnek kullanım kodları jeton sayfasıyla ortak parçadan gelir.
+            'ornekler'  => ApiExamples::tumu(ApiExamples::tabanUrl(), ApiExamples::ORNEK_JETON),
             'scripts'   => ['tokens.js'],
         ]);
     }

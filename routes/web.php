@@ -50,13 +50,27 @@ $router->get('dashboard', DashboardController::class, 'index', ['auth']);
 // SAYFALAMA ÖRNEĞİ (HTML): filtreler ve sayfa adres çubuğunda taşınır.
 $router->get('users', UserController::class, 'index', ['auth']);
 
-// API belgeleri – panelde, oturum arkasında.
-$router->get('docs', ApiDocController::class, 'index', ['auth']);
+/* API belgeleri – panelde, oturum arkasında.
+ *
+ * ADRES NEDEN "docs" DEĞİL?
+ * Projede diskte GERÇEK bir "docs/" klasörü var (README'nin ekran
+ * görüntüleri orada). .htaccess'teki temiz adres kuralı, istenen yol
+ * diskte var olan bir KLASÖRE denk geliyorsa isteği index.php'ye
+ * DEVRETMEZ (RewriteCond %{REQUEST_FILENAME} !-d). Yani "/docs"
+ * adresi hiçbir zaman bu rotaya ulaşmıyor, doğrudan o klasöre
+ * gidiyordu. Rotaya klasörle çakışmayan bir ad vermek, .htaccess'i
+ * özel durumlarla doldurmaktan daha sağlam bir çözüm. */
+$router->get('api-belgeleri', ApiDocController::class, 'index', ['auth']);
 
 /* Jeton yönetimi PANELDEDİR, API'de değil.
  * Jeton üretmek için API jetonu gerekseydi "tavuk-yumurta" sorunu
  * doğardı: ilk jetonu nasıl alacaktınız? */
 $router->get('tokens',         TokenController::class, 'index',  ['auth']);
+
+/* Örnek kullanım dosyası (cURL / PHP / JS / Python).
+ * GET'tir çünkü hiçbir şeyi DEĞİŞTİRMEZ: yalnızca metin üretip indirtir.
+ * Dosyaya gerçek jeton yazılmaz; bkz. TokenController::ornek(). */
+$router->get('tokens/ornek',   TokenController::class, 'ornek',  ['auth']);
 $router->post('tokens',        TokenController::class, 'store',  ['auth', 'csrf']);
 $router->post('tokens/revoke', TokenController::class, 'revoke', ['auth', 'csrf']);
 

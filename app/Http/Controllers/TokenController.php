@@ -22,6 +22,7 @@ use App\Core\Session;
 use App\Http\Controller;
 use App\Models\ApiToken;
 use App\Repositories\ApiTokenRepository;
+use App\Support\ApiExamples;
 
 final class TokenController extends Controller
 {
@@ -35,6 +36,11 @@ final class TokenController extends Controller
         $paginator = new Paginator($total, Paginator::pageFromRequest($request), 10);
         $tokens    = $repository->pageForUser($userId, $paginator->offset(), $paginator->perPage());
 
+        /* Jeton oturumdan BİR KEZ okunur; iki ayrı yerde pull()
+         * çağırmak ikincisine boş döndürürdü. */
+        $fresh       = Session::pull('_fresh_token');
+        $ornekJeton  = ($fresh !== null && $fresh !== '') ? (string) $fresh : ApiExamples::ORNEK_JETON;
+
         $this->view('tokens/index', [
             'title'     => 'API Jetonları',
             'subtitle'  => 'Uygulamalarınızın API erişimi',
@@ -45,7 +51,14 @@ final class TokenController extends Controller
              * Oturumda "flash" olarak taşınıp okunduğu anda silinir;
              * sayfa yenilenirse bir daha görünmez. Böylece jeton
              * ekranda, tarayıcı geçmişinde ve sunucuda kalıcı olmaz. */
-            'freshToken' => Session::pull('_fresh_token'),
+            'freshToken' => $fresh,
+
+            /* ÖRNEK KULLANIM
+             * Jeton üretmek yetmiyor; kullanıcı "şimdi ne yapacağım?"
+             * sorusuyla kalıyordu. Örnekler yeni üretilen jeton varsa
+             * ONUNLA, yoksa örnek bir değerle basılır. */
+            'ornekler'   => ApiExamples::tumu(ApiExamples::tabanUrl(), $ornekJeton),
+            'ornekGercek' => $fresh !== null && $fresh !== '',
 
             // Sayfaya özel kod; her sayfada yüklenmez.
             'scripts'    => ['tokens.js'],
@@ -100,6 +113,42 @@ final class TokenController extends Controller
         /* POST → Redirect → GET: kullanıcı F5'e bastığında form
          * yeniden gönderilmesin, ikinci bir jeton üretilmesin. */
         Response::redirect(url('tokens'));
+    }
+
+    /**
+     * Örnek kullanım dosyasını indirtir.
+     *
+     * DOSYAYA GERÇEK JETON YAZILMAZ. Sayfada jeton görünür (kullanıcı zaten
+     * o an ekranda okuyor) ama indirilen dosyaya yer tutucu konur: bir kimlik
+     * bilgisini dosyaya gömmek, onu "İndirilenler" klasöründe, yedeklerde ve
+     * er geç bir kod deposunda bırakmanın en kolay yoludur.
+     *
+     * Dil parametresi BEYAZ LİSTEDEN geçer; sorgudan gelen değer hiçbir
+     * zaman dosya adına veya yola karışmaz (yol geçişi (path traversal)
+     * yüzeyi oluşmaz).
+     */
+    public function ornek(Request $request): void
+    {
+        $dil     = (string) $request->input('dil');
+        $diller  = ApiExamples::diller();
+
+        if (!isset($diller[$dil])) {
+            Flash::error('Bilinmeyen örnek dosyası istendi.');
+            Response::redirect(url('tokens'));
+        }
+
+        $bilgi = $diller[$dil];
+        $kod   = ApiExamples::kod($dil, ApiExamples::tabanUrl(), ApiExamples::YER_TUTUCU);
+
+        /* Tarayıcı dosyayı GÖSTERMESİN, indirsin. "attachment" olmadan
+         * .php uzantılı içerik tarayıcıda düz metin olarak açılıyordu. */
+        header('Content-Type: ' . $bilgi['tur'] . '; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $bilgi['dosya'] . '"');
+        header('Content-Length: ' . strlen($kod));
+        header('X-Content-Type-Options: nosniff');
+
+        echo $kod;
+        exit;
     }
 
     /** Jetonu iptal eder. */

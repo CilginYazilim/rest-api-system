@@ -20,7 +20,7 @@ return [
         'items' => [
             ['route' => 'dashboard', 'icon' => 'dashboard', 'label' => 'Kontrol Paneli', 'short' => 'Panel'],
             ['route' => 'tokens',    'icon' => 'lock',      'label' => 'API Jetonları',  'short' => 'Jeton'],
-            ['route' => 'docs',      'icon' => 'activity',  'label' => 'API Belgeleri',  'short' => 'Belge'],
+            ['route' => 'api-belgeleri', 'icon' => 'activity',  'label' => 'API Belgeleri',  'short' => 'Belge'],
         ],
     ],
     [

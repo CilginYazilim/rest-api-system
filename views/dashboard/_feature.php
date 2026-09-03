@@ -36,7 +36,7 @@ $base = (Session::isHttps() ? 'https://' : 'http://')
             Yanıtın <code>meta</code> bölümünde sayfalama bilgisi,
             <code>links</code> bölümünde bir sonraki sayfanın adresi gelir.
             Tüm uç noktalar ve hata kodları için
-            <a href="<?= e(url('docs')) ?>">API Belgeleri</a> sayfasına bakın.
+            <a href="<?= e(url('api-belgeleri')) ?>">API Belgeleri</a> sayfasına bakın.
         </p>
     </div>
 </div>
