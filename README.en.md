@@ -181,9 +181,12 @@ curl -H "Authorization: Bearer cy_9f2b..." \
   ],
   "meta": {
     "total": 51,
-    "page": 2,
     "per_page": 10,
-    "total_pages": 6
+    "current_page": 2,
+    "last_page": 6,
+    "from": 11,
+    "to": 20,
+    "has_more": true
   },
   "links": {
     "self": "http://localhost/rest-api-system/api/v1/users?page=2&per=10",
@@ -373,7 +376,7 @@ curl -H "Authorization: Bearer cy_..." \
   "data": [ { "id": 11, "name": "Fatma", "surname": "YILDIZ",
               "email": "fatma.yildiz@ornek.com", "is_active": false,
               "created_at": "2025-01-15T23:58:29+03:00" } ],
-  "meta":  { "total": 51, "page": 2, "per_page": 10, "total_pages": 6 },
+  "meta":  { "total": 51, "per_page": 10, "current_page": 2, "last_page": 6, "from": 11, "to": 20, "has_more": true },
   "links": { "self": "...page=2&per=10",
              "next": "...page=3&per=10",
              "prev": "...page=1&per=10" }

@@ -26,6 +26,16 @@ kurallarına uyar.
   açılır listeler anında, arama kutusu 450 ms beklemeyle. JavaScript
   kapalıysa düğme görünür kalır ve form normal gönderilir.
 
+### Düzeltildi
+
+- **Örnek Kullanım** kodlarındaki PHP/JS/Python uyarısı: `meta.total_pages`
+  diye bir alan hiç var olmadı. Gerçek API yanıtı `total`, `per_page`,
+  `current_page`, `last_page`, `from`, `to`, `has_more` alanlarını taşır
+  (bkz. `Paginator::toArray()`); örnekler `total_pages` okumaya çalışınca
+  indirilen PHP dosyası `Warning: Undefined array key "total_pages"`
+  veriyordu. README'deki iki örnek yanıt gövdesi de aynı yanlış alanı
+  gösteriyordu; ikisi de gerçek şemaya göre düzeltildi.
+
 ### Değişti
 
 - API belgeleri sayfasının adresi `docs` → **`api-belgeleri`**. Diskteki

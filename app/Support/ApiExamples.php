@@ -133,7 +133,7 @@ final class ApiExamples
             # -----------------------------------------------------------------
             # 1) LISTELE  (kapsam: read)
             #    Yanit data/meta/links zarfiyla gelir; sayfalamayi tahmin
-            #    etmeniz gerekmez, meta.total_pages icinde yazar.
+            #    etmeniz gerekmez, meta.last_page icinde yazar.
             # -----------------------------------------------------------------
             curl -s "\${AUTH[@]}" "\$BASE/users?per=10&page=1"
 
@@ -241,7 +241,7 @@ final class ApiExamples
                 }
 
                 \$meta = \$cevap['govde']['meta'];
-                printf("Toplam %d kayit, %d sayfa\\n", \$meta['total'], \$meta['total_pages']);
+                printf("Toplam %d kayit, %d sayfa (su an %d/%d)\\n", \$meta['total'], \$meta['last_page'], \$meta['current_page'], \$meta['last_page']);
             }
 
             // -----------------------------------------------------------------
@@ -332,8 +332,8 @@ final class ApiExamples
                         console.log(`#\${k.id}  \${k.name} \${k.surname}  <\${k.email}>`);
                     });
 
-                    const { total, total_pages: sayfa } = liste.govde.meta;
-                    console.log(`Toplam \${total} kayit, \${sayfa} sayfa`);
+                    const { total, current_page: sayfa, last_page: sonSayfa } = liste.govde.meta;
+                    console.log(`Toplam \${total} kayit, \${sonSayfa} sayfa (su an \${sayfa}/\${sonSayfa})`);
                 }
 
                 // -------------------------------------------------------------
@@ -416,7 +416,7 @@ final class ApiExamples
                     print(f"#{k['id']}  {k['name']} {k['surname']}  <{k['email']}>")
 
                 meta = govde["meta"]
-                print(f"Toplam {meta['total']} kayit, {meta['total_pages']} sayfa")
+                print(f"Toplam {meta['total']} kayit, {meta['last_page']} sayfa (su an {meta['current_page']}/{meta['last_page']})")
 
             # -----------------------------------------------------------------
             # 2) TEK KAYIT  (kapsam: read)
