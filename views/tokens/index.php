@@ -184,7 +184,7 @@ use App\Core\View;
                                    yalnızca SHA-256 özeti durur, düz hâli hiçbir yerde
                                    saklanmaz. Modal, elimizde OLAN her şeyi gösterir. */
                                 ?>
-                                <button type="button" class="btn cy-btn cy-btn--sm"
+                                <button type="button" class="btn cy-btn cy-btn--sm cy-btn--ghost"
                                         data-jeton-detay
                                         data-ad="<?= e($token->name, 'attr') ?>"
                                         data-id="<?= (int) $token->id ?>"
@@ -277,7 +277,7 @@ use App\Core\View;
             </div>
 
             <div class="modal-footer">
-                <a href="#ornek-kullanim" class="btn cy-btn cy-btn--sm" data-bs-dismiss="modal">
+                <a href="#ornek-kullanim" class="btn cy-btn cy-btn--sm cy-btn--ghost" data-bs-dismiss="modal">
                     Örnek kullanıma git
                 </a>
                 <button type="button" class="btn cy-btn cy-btn--sm cy-btn--primary" data-bs-dismiss="modal">

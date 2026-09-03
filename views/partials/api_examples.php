@@ -74,7 +74,7 @@ $gercek = !empty($ornekGercek);
 
                     <span class="cy-ornek__spacer"></span>
 
-                    <button type="button" class="btn cy-btn cy-btn--sm"
+                    <button type="button" class="btn cy-btn cy-btn--sm cy-btn--ghost"
                             data-kopyala="#ornek-kod-<?= e($ornek['anahtar']) ?>">
                         Kopyala
                     </button>
