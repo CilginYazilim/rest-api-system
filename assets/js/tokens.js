@@ -133,7 +133,36 @@
     });
 
     /* ---------------------------------------------------------------
-     *  4) İPTAL ONAYI
+     *  4) JETON DETAY MODALI
+     * ---------------------------------------------------------------
+     *  Sayfada TEK modal var; hangi satırın düğmesine basıldıysa
+     *  içerik oradan doldurulur. Her satır için ayrı modal basmak,
+     *  10 jetonda 10 kopya HTML demekti.
+     *
+     *  Jetonun KENDİSİ burada yok ve olamaz: veritabanında yalnızca
+     *  SHA-256 özeti duruyor. Modal, elimizde OLAN her şeyi gösterir.
+     * ------------------------------------------------------------- */
+    $(document).on('click', '[data-jeton-detay]', function () {
+        var $dugme = $(this);
+
+        $('#jd_ad').text($dugme.data('ad'));
+        $('#jd_id').text('#' + $dugme.data('id'));
+        $('#jd_kapsam').text($dugme.data('kapsam'));
+        $('#jd_olusturma').text($dugme.data('olusturma'));
+        $('#jd_kullanim').text($dugme.data('kullanim'));
+        $('#jd_ip').text($dugme.data('ip'));
+        $('#jd_durum').text($dugme.data('durum'));
+
+        var iptal = String($dugme.data('iptal') || '');
+
+        $('#jd_iptal').text(iptal);
+        document.getElementById('jd_iptal_satir').hidden = iptal === '';
+
+        window.bootstrap.Modal.getOrCreateInstance(document.getElementById('jetonDetayModal')).show();
+    });
+
+    /* ---------------------------------------------------------------
+     *  5) İPTAL ONAYI
      * ---------------------------------------------------------------
      *  Jeton iptali GERİ ALINAMAZ: o jetonu kullanan uygulamalar
      *  anında erişimini kaybeder. Tek tıkla olmasına izin vermiyoruz.

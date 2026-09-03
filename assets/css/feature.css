@@ -173,3 +173,13 @@
     .cy-ornek__ad { width: 100%; }
     .cy-ornek__kod { max-height: 18rem; }
 }
+
+/* ==================================================================
+ *  CANLI FİLTRE
+ * ------------------------------------------------------------------
+ *  Filtreler "Uygula"ya basmadan çalışıyor; düğme JavaScript
+ *  çalışıyorken işlevsiz kalıyor ve yer kaplıyor. Sınıf JS tarafından
+ *  eklenir: JS kapalıysa düğme görünür kalır ve form normal şekilde
+ *  gönderilir — hiçbir işlev kaybolmaz.
+ * ================================================================== */
+form.cy-toolbar.is-live button[type="submit"] { display: none; }

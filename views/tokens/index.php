@@ -49,17 +49,6 @@ use App\Core\View;
     </div>
 <?php endif; ?>
 
-<?php
-/* ÖRNEK KULLANIM
-   Jeton üretmek yetmiyordu: kullanıcı jetonu alıp "peki şimdi ne
-   yapacağım?" sorusuyla kalıyordu. Çalışır durumdaki örnekler jetonun
-   hemen altında duruyor. Aynı parça API Belgeleri sayfasında da var. */
-View::partial('partials/api_examples', [
-    'ornekler'    => $ornekler ?? [],
-    'ornekGercek' => $ornekGercek ?? false,
-]);
-?>
-
 <!-- ==============================================================
      YENİ JETON ÜRETME
 ============================================================== -->
@@ -189,6 +178,25 @@ View::partial('partials/api_examples', [
                             </td>
 
                             <td class="text-end">
+                                <?php
+                                /* DETAYLAR
+                                   Jetonun KENDİSİ burada gösterilemez: veritabanında
+                                   yalnızca SHA-256 özeti durur, düz hâli hiçbir yerde
+                                   saklanmaz. Modal, elimizde OLAN her şeyi gösterir. */
+                                ?>
+                                <button type="button" class="btn cy-btn cy-btn--sm"
+                                        data-jeton-detay
+                                        data-ad="<?= e($token->name, 'attr') ?>"
+                                        data-id="<?= (int) $token->id ?>"
+                                        data-kapsam="<?= e(implode(' · ', $token->scopes), 'attr') ?>"
+                                        data-olusturma="<?= e((string) $token->createdAt, 'attr') ?>"
+                                        data-kullanim="<?= e($token->lastUsedAt === null ? 'Hiç kullanılmadı' : (string) $token->lastUsedAt, 'attr') ?>"
+                                        data-ip="<?= e($token->lastUsedIp === '' ? '—' : $token->lastUsedIp, 'attr') ?>"
+                                        data-durum="<?= $token->isRevoked() ? 'İptal edildi' : 'Etkin' ?>"
+                                        data-iptal="<?= e((string) ($token->revokedAt ?? ''), 'attr') ?>">
+                                    Detaylar
+                                </button>
+
                                 <?php if (!$token->isRevoked()): ?>
                                     <?php /* İPTAL NEDEN FORM (POST)?
                                              Bağlantı (GET) olsaydı, bir <img> etiketi
@@ -218,3 +226,75 @@ View::partial('partials/api_examples', [
         ]); ?>
     </div>
 </div>
+
+<!-- ==============================================================
+     JETON DETAY MODALI
+     --------------------------------------------------------------
+     Tek bir modal vardır; hangi satırın "Detaylar" düğmesine
+     basıldıysa içerik oradan doldurulur. Her satır için ayrı modal
+     basmak, 10 jetonda 10 kopya HTML demekti.
+============================================================== -->
+<div class="modal fade" id="jetonDetayModal" tabindex="-1" aria-labelledby="jetonDetayBaslik" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="jetonDetayBaslik">Jeton detayı</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!--
+                    JETONUN KENDİSİ NEDEN YOK?
+                    Bu kutu, örneğin en önemli güvenlik kararını anlatıyor.
+                    Kaldırmayın: kullanıcı "neden göremiyorum?" diye sorduğunda
+                    yanıtı tam burada bulmalı.
+                -->
+                <div class="cy-token-box mb-3">
+                    <code id="jd_maske">cy_••••••••••••••••••••••••••••••••</code>
+                </div>
+
+                <p class="cy-muted" style="font-size:.8125rem">
+                    <strong>Jetonun kendisi bir daha gösterilemez.</strong> Veritabanında
+                    yalnızca <strong>SHA-256 özeti</strong> saklanır; düz hâli üretildiği
+                    anda ekranda bir kez gösterilir ve hiçbir yerde tutulmaz. Bu, jeton
+                    tablosu sızsa bile kimsenin jetonları kullanamaması içindir —
+                    parolaların neden özetlenerek saklandığıyla aynı gerekçe.
+                    Jetonu kaybettiyseniz <strong>yenisini üretip eskisini iptal edin</strong>.
+                </p>
+
+                <table class="cy-param-table w-100">
+                    <tr><td>Ad</td><td id="jd_ad" class="text-muted"></td></tr>
+                    <tr><td>Numara</td><td id="jd_id" class="text-muted"></td></tr>
+                    <tr><td>Yetkiler</td><td id="jd_kapsam" class="text-muted"></td></tr>
+                    <tr><td>Oluşturma</td><td id="jd_olusturma" class="text-muted"></td></tr>
+                    <tr><td>Son kullanım</td><td id="jd_kullanim" class="text-muted"></td></tr>
+                    <tr><td>Son IP</td><td id="jd_ip" class="text-muted"></td></tr>
+                    <tr><td>Durum</td><td id="jd_durum" class="text-muted"></td></tr>
+                    <tr id="jd_iptal_satir" hidden><td>İptal</td><td id="jd_iptal" class="text-muted"></td></tr>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <a href="#ornek-kullanim" class="btn cy-btn cy-btn--sm" data-bs-dismiss="modal">
+                    Örnek kullanıma git
+                </a>
+                <button type="button" class="btn cy-btn cy-btn--sm cy-btn--primary" data-bs-dismiss="modal">
+                    Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+/* ÖRNEK KULLANIM — sayfanın SONUNDA.
+   Sıra bilerek böyle: önce jeton üretilir, sonra üretilen jetonlar
+   görülür, en sonda "peki bununla ne yapacağım?" sorusunun yanıtı
+   gelir. Aynı parça API Belgeleri sayfasında da basılır. */
+View::partial('partials/api_examples', [
+    'ornekler'    => $ornekler ?? [],
+    'ornekGercek' => $ornekGercek ?? false,
+]);
+?>

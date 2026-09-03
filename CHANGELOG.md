@@ -18,6 +18,13 @@ kurallarına uyar.
   **gerçek jeton yazılmaz**; yerine `BURAYA_JETONUNUZU_YAPISTIRIN` konur.
 - `docs/index.html`: ekran görüntüsü galerisi. `docs/` adresi, dizin
   listeleme kapalı olduğu için `403` dönüyordu.
+- Jeton listesinde **Detaylar** düğmesi ve modal: ad, numara, yetkiler,
+  oluşturma, son kullanım + IP, durum ve iptal tarihi. Jetonun kendisi
+  gösterilemez (veritabanında yalnızca SHA-256 özeti var); modal bunun
+  nedenini de anlatır.
+- Kullanıcılar sayfasında filtreler **"Uygula"ya basmadan** çalışır:
+  açılır listeler anında, arama kutusu 450 ms beklemeyle. JavaScript
+  kapalıysa düğme görünür kalır ve form normal gönderilir.
 
 ### Değişti
 
@@ -26,6 +33,9 @@ kurallarına uyar.
   bir klasöre denk gelen isteği `index.php`'ye devretmiyor
   (`RewriteCond %{REQUEST_FILENAME} !-d`). Sayfaya hiç ulaşılamıyordu.
 - `.htaccess`: `DirectoryIndex`'e `index.html` eklendi.
+- Jeton sayfasının bölüm sırası: **Yeni Jeton → Jetonlarım → Örnek
+  Kullanım**. Önce jeton üretilir, sonra üretilenler görülür, en sonda
+  "bununla ne yapacağım?" sorusunun yanıtı gelir.
 
 ---
 
