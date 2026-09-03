@@ -6,7 +6,7 @@ kurallarına uyar.
 
 ---
 
-## [Yayınlanmamış]
+## [1.1.0] — 2026-09-03
 
 ### Eklendi
 
@@ -45,6 +45,11 @@ kurallarına uyar.
   >   ADD COLUMN request_count INT UNSIGNED NOT NULL DEFAULT 0
   >   AFTER last_used_ip;
   > ```
+- `.gitattributes`: satır sonları depoda her zaman LF olarak saklanır,
+  ikili dosyalar (PNG, font) işaretlendi. Bu dosya olmadan satır sonu
+  davranışı her katkıcının `core.autocrlf` ayarına kalıyor ve tek bir
+  boşluk değişmediği hâlde "dosyanın tamamı değişti" diyen commit'ler
+  çıkıyordu.
 
 ### Düzeltildi
 
@@ -76,6 +81,24 @@ kurallarına uyar.
 - Jeton sayfasının bölüm sırası: **Yeni Jeton → Jetonlarım → Örnek
   Kullanım**. Önce jeton üretilir, sonra üretilenler görülür, en sonda
   "bununla ne yapacağım?" sorusunun yanıtı gelir.
+
+### Kaldırıldı
+
+- `views/errors/403.php`. Ortak panel iskeletinden geliyordu ama bu
+  projede rol tabanlı kısıt yok: hiçbir kod yolu bu görünümü basmıyordu.
+  (Panel yetkisizlikte `login`'e yönlendirir, CSRF hatasında `dashboard`'a
+  döner; API ise HTML değil `403 insufficient_scope` JSON'u döndürür.)
+- `config/config.php` içindeki `'locale' => 'tr_TR'` anahtarı. Hiçbir
+  yerden okunmuyordu; tarih ve sayı biçimlendirmesi `human_date()` ile
+  elle yapılıyor.
+
+### Güvenlik
+
+- `.env.example` artık `APP_DEBUG=true` ile **gelmiyor**; satır yorumda.
+  Dosyayı olduğu gibi kopyalayıp canlıya çıkan biri, açık hata yığınıyla
+  dosya yollarını, tablo adlarını ve sorgularını sızdırıyordu. Satır
+  yokken `Env::isLocalHost()` karar veriyor: yerelde açık, gerçek alan
+  adında kapalı.
 
 ---
 
@@ -131,4 +154,5 @@ kurallarına uyar.
 - "Son İşlemler" listesi `id DESC` ile sıralanıyordu; başlık zamana işaret
   ettiği hâlde sıra tarihle uyuşmuyordu. Artık `created_at DESC, id DESC`
 
+[1.1.0]: https://github.com/CilginYazilim/rest-api-system/releases/tag/v1.1.0
 [1.0.0]: https://github.com/CilginYazilim/rest-api-system/releases/tag/v1.0.0

@@ -45,7 +45,6 @@ return [
         'debug'    => Env::bool('APP_DEBUG', Env::isLocalHost()),
 
         'timezone' => 'Europe/Istanbul',
-        'locale'   => 'tr_TR',
 
         /**
          * pretty_urls = true  → "/rest-api-system/users"        (varsayılan)

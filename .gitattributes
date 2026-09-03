@@ -1,0 +1,51 @@
+# =====================================================================
+#  SATIR SONLARI VE DOSYA TÜRLERİ
+# ---------------------------------------------------------------------
+#  NEDEN GEREKLİ?
+#  Windows satır sonu olarak CRLF, Linux/macOS ise LF kullanır. Bu dosya
+#  olmadan, satır sonu davranışı her katkıcının kendi git ayarına
+#  (core.autocrlf) kalır. Sonuç, tek bir boşluk bile değiştirmediğiniz
+#  hâlde "dosyanın tamamı değişti" diyen commit'lerdir: gerçek
+#  değişikliği bu gürültünün içinde görmek imkânsızlaşır.
+#
+#  Aşağıdaki kural depoda HER ZAMAN LF saklar; çalışma dizininde
+#  Windows kullanıcısı yine CRLF görür. Yani kimse alışkanlığını
+#  değiştirmek zorunda kalmaz, depo yine de tutarlı kalır.
+# =====================================================================
+
+# Metin dosyaları depoda LF ile saklanır (otomatik tespit).
+* text=auto eol=lf
+
+# ---------------------------------------------------------------------
+#  KABUK BETİKLERİ MUTLAKA LF OLMALI
+# ---------------------------------------------------------------------
+#  CRLF ile biten bir .sh dosyası Linux'ta çalışmaz; kabuk, satır
+#  sonundaki \r karakterini komutun parçası sanar ve
+#  "bad interpreter: /usr/bin/env bash^M" hatası verir.
+*.sh text eol=lf
+
+# ---------------------------------------------------------------------
+#  İKİLİ (BINARY) DOSYALAR
+# ---------------------------------------------------------------------
+#  İşaretlenmezse git bunları metin sanıp satır sonu dönüşümü uygular
+#  ve dosyayı BOZAR. Ayrıca anlamsız "binary diff" çıktısı üretmez.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+
+# ---------------------------------------------------------------------
+#  GITHUB DİL İSTATİSTİĞİ
+# ---------------------------------------------------------------------
+#  Bootstrap ve jQuery bu depoya BİLEREK dahil edildi (sıfır bağımlılık:
+#  CDN yok, npm yok). Ama bunlar bizim yazdığımız kod değildir; depo
+#  dilini "JavaScript" gösterip PHP örneğini gölgeliyorlardı.
+#  linguist-vendored, GitHub'ın dil çubuğunda bunları saymamasını sağlar.
+assets/js/bootstrap.bundle.js linguist-vendored
+assets/js/jquery-3.7.0.js     linguist-vendored
+assets/css/bootstrap.min.css  linguist-vendored
