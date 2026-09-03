@@ -58,4 +58,4 @@ kurallarına uyar.
 - "Son İşlemler" listesi `id DESC` ile sıralanıyordu; başlık zamana işaret
   ettiği hâlde sıra tarihle uyuşmuyordu. Artık `created_at DESC, id DESC`
 
-[1.0.0]: https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel/releases/tag/v1.0.0
+[1.0.0]: https://github.com/CilginYazilim/rest-api-system/releases/tag/v1.0.0

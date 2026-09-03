@@ -16,7 +16,7 @@
 
 **🇹🇷 Türkçe** · [🇬🇧 English](README.en.md)
 
-[**▶ Canlı Demo**](https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/) · [Kaynak Kütüphanesi](https://cilginyazilim.com/kutuphane/php-rest-api-panel) · [cilginyazilim.com](https://cilginyazilim.com)
+[**▶ Canlı Demo**](https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/) · [Kaynak Kütüphanesi](https://cilginyazilim.com/kutuphane/php-rest-api-panel) · [cilginyazilim.com](https://cilginyazilim.com)
 
 </div>
 
@@ -28,13 +28,13 @@
 
 **Kurulum yok, kayıt yok, indirme yok — tarayıcınızdan 3 saniyede deneyin.**
 
-<a href="https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/"><img src="https://img.shields.io/badge/CANLI_DEMOYU_A%C3%87-0b5cb5?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=061321" alt="Canlı Demoyu Aç" height="42"></a>
+<a href="https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/"><img src="https://img.shields.io/badge/CANLI_DEMOYU_A%C3%87-0b5cb5?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=061321" alt="Canlı Demoyu Aç" height="42"></a>
 <a href="https://cilginyazilim.com/kutuphane/php-rest-api-panel"><img src="https://img.shields.io/badge/KAYNAK_KODU_%C4%B0NCELE-0ea5e9?style=for-the-badge&logo=readthedocs&logoColor=white&labelColor=061321" alt="Kaynak Kodu İncele" height="42"></a>
-<a href="https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/ZIP_%C4%B0ND%C4%B0R-16a34a?style=for-the-badge&logo=github&logoColor=white&labelColor=061321" alt="ZIP İndir" height="42"></a>
+<a href="https://github.com/CilginYazilim/rest-api-system/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/ZIP_%C4%B0ND%C4%B0R-16a34a?style=for-the-badge&logo=github&logoColor=white&labelColor=061321" alt="ZIP İndir" height="42"></a>
 
 <br><br>
 
-<a href="https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/" title="Canlı demoyu açmak için tıklayın">
+<a href="https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/" title="Canlı demoyu açmak için tıklayın">
   <img src="docs/screenshots/03-api-jetonlari.png" alt="REST API sistemi canlı demo önizlemesi" width="860">
 </a>
 
@@ -520,8 +520,8 @@ curl -X DELETE -H "Authorization: Bearer cy_..." \
 ### Adımlar
 
 ```bash
-git clone https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel.git
-cd PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel
+git clone https://github.com/CilginYazilim/rest-api-system.git
+cd rest-api-system
 
 mysql -u root -p < database.sql
 cp .env.example .env        # Windows: copy .env.example .env
@@ -804,7 +804,7 @@ Sürüm numarasını adrese koymanın sebebi budur: istemciler kendi hızlarınd
 
 ## Katkı
 
-Hata bildirimi ve öneriler için [issue açabilirsiniz](https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel/issues).
+Hata bildirimi ve öneriler için [issue açabilirsiniz](https://github.com/CilginYazilim/rest-api-system/issues).
 
 ## Lisans
 

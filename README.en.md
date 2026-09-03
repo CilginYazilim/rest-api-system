@@ -16,7 +16,7 @@
 
 [🇹🇷 Türkçe](README.md) · **🇬🇧 English**
 
-[**▶ Live Demo**](https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/) · [Code Library](https://cilginyazilim.com/kutuphane/php-rest-api-panel) · [cilginyazilim.com](https://cilginyazilim.com)
+[**▶ Live Demo**](https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/) · [Code Library](https://cilginyazilim.com/kutuphane/php-rest-api-panel) · [cilginyazilim.com](https://cilginyazilim.com)
 
 </div>
 
@@ -28,13 +28,13 @@
 
 **No setup, no sign-up, no download — try it in your browser in 3 seconds.**
 
-<a href="https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/"><img src="https://img.shields.io/badge/OPEN_LIVE_DEMO-0b5cb5?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=061321" alt="Open Live Demo" height="42"></a>
+<a href="https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/"><img src="https://img.shields.io/badge/OPEN_LIVE_DEMO-0b5cb5?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=061321" alt="Open Live Demo" height="42"></a>
 <a href="https://cilginyazilim.com/kutuphane/php-rest-api-panel"><img src="https://img.shields.io/badge/BROWSE_SOURCE-0ea5e9?style=for-the-badge&logo=readthedocs&logoColor=white&labelColor=061321" alt="Browse Source" height="42"></a>
-<a href="https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/DOWNLOAD_ZIP-16a34a?style=for-the-badge&logo=github&logoColor=white&labelColor=061321" alt="Download ZIP" height="42"></a>
+<a href="https://github.com/CilginYazilim/rest-api-system/archive/refs/heads/main.zip"><img src="https://img.shields.io/badge/DOWNLOAD_ZIP-16a34a?style=for-the-badge&logo=github&logoColor=white&labelColor=061321" alt="Download ZIP" height="42"></a>
 
 <br><br>
 
-<a href="https://cilginyazilim.com/kutuphane/uygulama/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel-main/" title="Click to open the live demo">
+<a href="https://cilginyazilim.com/kutuphane/uygulama/rest-api-system/" title="Click to open the live demo">
   <img src="docs/screenshots/03-api-jetonlari.png" alt="REST API system live demo preview" width="860">
 </a>
 
@@ -520,8 +520,8 @@ curl -X DELETE -H "Authorization: Bearer cy_..." \
 ### Steps
 
 ```bash
-git clone https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel.git
-cd PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel
+git clone https://github.com/CilginYazilim/rest-api-system.git
+cd rest-api-system
 
 mysql -u root -p < database.sql
 cp .env.example .env        # Windows: copy .env.example .env
@@ -804,7 +804,7 @@ That's why the version lives in the URL: clients migrate at their own pace. Anno
 
 ## Contributing
 
-Open an [issue](https://github.com/CilginYazilim/PHP-MySQL-REST-API-Sistemi-Jeton-Kapsam-Hiz-Siniri-Panel/issues) for bug reports and suggestions.
+Open an [issue](https://github.com/CilginYazilim/rest-api-system/issues) for bug reports and suggestions.
 
 ## License
 
