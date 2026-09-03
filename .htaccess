@@ -1,0 +1,138 @@
+# =====================================================================
+#  CY ADMIN – Apache yapılandırması
+#  cilginyazilim.com
+# ---------------------------------------------------------------------
+#  Bu dosya olmasa da uygulama çalışır (adresler "index.php?r=..."
+#  biçimindedir). Ancak buradaki kurallar ek güvenlik sağlar.
+#
+#  Nginx kullanıyorsanız bu dosya YOK SAYILIR; aynı korumaları
+#  sunucu bloğunuzda tanımlamanız gerekir (README'ye bakın).
+# =====================================================================
+
+# ---------------------------------------------------------------------
+#  1) DİZİN LİSTELEME KAPALI
+# ---------------------------------------------------------------------
+#  Açık olsaydı, index dosyası bulunmayan bir klasöre girildiğinde
+#  içindeki tüm dosyalar listelenirdi.
+Options -Indexes
+
+# Varsayılan giriş dosyası
+DirectoryIndex index.php
+
+# ---------------------------------------------------------------------
+#  2) HASSAS DOSYALARA ERİŞİM ENGELİ
+# ---------------------------------------------------------------------
+#  .env dosyası veritabanı şifrenizi içerir. Tarayıcıdan okunabilirse
+#  sunucunuz ele geçirilir. Bu, en sık yapılan kurulum hatalarındandır.
+<FilesMatch "^\.env|^\.env\..*|composer\.(json|lock)$|\.(sql|md|log|ini|sh|bak|swp|dist)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Nokta ile başlayan tüm dosyalar (.git, .env, .htpasswd …)
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ---------------------------------------------------------------------
+#  3) TEMİZ ADRESLER
+# ---------------------------------------------------------------------
+#  Bu kural sayesinde adresler şöyle görünür:
+#
+#      /rbac-login-system/login          (index.php?r=login yerine)
+#      /rbac-login-system/users
+#
+#  NASIL ÇALIŞIR?
+#  Apache, istenen yol diskte GERÇEK bir dosya veya klasör DEĞİLSE
+#  isteği index.php'ye devreder ve yolu "r" parametresinde taşır.
+#  Tarayıcı bunu görmez; adres çubuğunda temiz hâli kalır.
+#
+#  mod_rewrite kapalıysa ne olur? Hiçbir şey bozulmaz: uygulama
+#  .env içindeki APP_PRETTY_URLS=false ile eski biçime döner.
+#  (Sistem sayfası mod_rewrite'ın açık olup olmadığını size söyler.)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # -----------------------------------------------------------------
+    #  AUTHORIZATION BAŞLIĞINI PHP'YE GEÇİR
+    # -----------------------------------------------------------------
+    #  Apache, CGI/FastCGI modunda "Authorization" başlığını güvenlik
+    #  gerekçesiyle AYIKLAR ve PHP'ye hiç ulaşmaz. Sonuç: doğru jetonu
+    #  gönderdiğiniz hâlde her istek 401 döner ve sebebi hiçbir yerde
+    #  görünmez — API kurarken en çok zaman kaybettiren tuzaklardan
+    #  biridir.
+    #
+    #  Aşağıdaki kural başlığı bir ortam değişkenine kopyalar; PHP onu
+    #  $_SERVER['HTTP_AUTHORIZATION'] olarak görür.
+    #
+    #  Nginx'te karşılığı:
+    #      fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # RewriteBase BİLEREK YAZILMADI.
+    # Bu dosya hangi klasördeyse Apache kuralı o klasöre göreli
+    # çözümler; yani proje "htdocs/rbac-login-system" altında da, alan adının
+    # kökünde de aynı şekilde çalışır. Buraya "RewriteBase /" yazmak,
+    # alt klasör kurulumunda isteği yanlışlıkla htdocs kökündeki
+    # index.php'ye gönderir (XAMPP'ta karşılama sayfasına düşersiniz).
+
+    # Var olan dosya ve klasörlere dokunma (CSS, JS, görseller, upload).
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # QSA : adresteki mevcut ?a=b parametreleri korunur
+    # L   : bu kural eşleşirse sonrakilere bakma
+    RewriteRule ^(.*)$ index.php?r=$1 [QSA,L]
+</IfModule>
+
+# ---------------------------------------------------------------------
+#  4) GÜVENLİK BAŞLIKLARI (yedek katman)
+# ---------------------------------------------------------------------
+#  PHP zaten bu başlıkları gönderiyor (App\Core\Response). Buradaki
+#  tanımlar, PHP çalışmadan servis edilen statik dosyaları da kapsar.
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # PHP sürümünü gizle
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+</IfModule>
+
+# ---------------------------------------------------------------------
+#  5) İSTEMCİ ÖNBELLEĞİ
+# ---------------------------------------------------------------------
+#  Statik dosyalar bir yıl önbellekte tutulur; sayfa açılışı hızlanır.
+#  Dosyayı güncelleyince adresine ?v=2 gibi bir parametre ekleyin.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css             "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png            "access plus 1 year"
+    ExpiresByType image/jpeg           "access plus 1 year"
+    ExpiresByType image/webp           "access plus 1 year"
+    ExpiresByType image/svg+xml        "access plus 1 year"
+    ExpiresByType image/x-icon         "access plus 1 year"
+</IfModule>
+
+# ---------------------------------------------------------------------
+#  6) SIKIŞTIRMA
+# ---------------------------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>

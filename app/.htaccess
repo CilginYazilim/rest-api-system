@@ -1,0 +1,20 @@
+# =====================================================================
+#  UYGULAMA KODUNA DOĞRUDAN ERİŞİM YASAK
+# ---------------------------------------------------------------------
+#  Bu klasördeki PHP dosyaları yalnızca kökteki index.php tarafından
+#  dahil edilmek üzere yazılmıştır. Tarayıcıdan doğrudan çağrılırlarsa
+#  sınıflar tanımsız olur ve hata mesajları dosya yollarını ele verir.
+#
+#  İDEAL ÇÖZÜM: Sunucunun web kökünü (document root) bu klasörün
+#  DIŞINDA bir yere ayarlamaktır. Paylaşımlı hostinglerde bu her zaman
+#  mümkün olmadığı için .htaccess ile engelliyoruz.
+# =====================================================================
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

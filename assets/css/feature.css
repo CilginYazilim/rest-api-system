@@ -1,0 +1,88 @@
+/* ==================================================================
+ *  REST API Sistemi – PROJEYE ÖZEL STİLLER
+ *  cilginyazilim.com
+ * ================================================================== */
+
+/* --- Yeni üretilen jeton kutusu --- */
+.cy-fresh-token { border-color: var(--cy-success, #16a34a); }
+
+.cy-token-box {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .7rem .85rem;
+    border: 1px solid var(--cy-border);
+    border-radius: var(--cy-radius-sm);
+    background: var(--cy-surface-soft);
+}
+
+.cy-token-box code {
+    flex: 1;
+    min-width: 0;
+    font-size: .8125rem;
+
+    /* Jeton uzundur ve boşluk içermez; kırılmasına izin vermezsek
+       kutudan taşar ve düzeni bozar. */
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+    .cy-token-box { flex-direction: column; align-items: stretch; }
+    .cy-token-box .cy-btn { width: 100%; justify-content: center; }
+}
+
+/* --- API belgeleri --- */
+.cy-endpoint {
+    border: 1px solid var(--cy-border);
+    border-radius: var(--cy-radius-sm);
+    margin-bottom: .85rem;
+    overflow: hidden;
+}
+
+.cy-endpoint__head {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-wrap: wrap;
+    padding: .7rem .85rem;
+    background: var(--cy-surface-soft);
+}
+
+/* HTTP metodu renkle ayrılır: listede aranan uç nokta göz taramasıyla
+   bulunur. Renk TEK ipucu değildir; metot adı zaten yazılıdır. */
+.cy-method {
+    padding: .15rem .5rem;
+    border-radius: var(--cy-radius-sm);
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    color: #fff;
+}
+
+.cy-method--get    { background: #0d6efd; }
+.cy-method--post   { background: #16a34a; }
+.cy-method--patch  { background: #f59e0b; }
+.cy-method--delete { background: #dc3545; }
+
+.cy-endpoint__path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .875rem; }
+.cy-endpoint__scope { margin-left: auto; }
+.cy-endpoint__body { padding: .85rem; font-size: .875rem; line-height: 1.65; }
+
+/* Örnek istek/yanıt blokları telefonda yatay kaydırılır; satırları
+   kırmak curl komutunu okunmaz hale getirirdi. */
+.cy-code {
+    display: block;
+    padding: .75rem .85rem;
+    margin: .5rem 0 0;
+    border-radius: var(--cy-radius-sm);
+    background: var(--cy-surface-soft);
+    font-size: .8125rem;
+    line-height: 1.6;
+    white-space: pre;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cy-param-table { font-size: .8125rem; margin-top: .5rem; }
+.cy-param-table td { padding: .3rem .5rem; vertical-align: top; }
+.cy-param-table td:first-child { white-space: nowrap; font-family: ui-monospace, monospace; }

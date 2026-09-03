@@ -1,0 +1,953 @@
+/* ==================================================================
+ *  ÇILGIN YAZILIM – TASARIM KALIBI (Design System)
+ *  cilginyazilim.com
+ * ------------------------------------------------------------------
+ *  Bu dosya, Çılgın Yazılım projelerinin ORTAK görsel kimliğidir.
+ *  Bootstrap 5'in ÜZERİNE eklenir, Bootstrap'i değiştirmez.
+ *
+ *  TASARIM YAKLAŞIMI: SAKİN VE İŞLEVSEL
+ *    - Renk, yalnızca ANLAM taşıdığı yerde kullanılır (durum, eylem)
+ *    - Gradyan her yerde değil, sadece birincil eylemde
+ *    - Ayrım için gölge yerine ince çizgi tercih edilir
+ *    - Boşluk (whitespace) bir bileşen kadar önemlidir
+ *
+ *  İÇİNDEKİLER
+ *     1. Tasarım token'ları (renk, ölçü, gölge)
+ *     2. Koyu tema
+ *     3. Temel sıfırlama
+ *     4. Tipografi
+ *     5. Kart
+ *     6. Buton
+ *     7. Rozet · etiket · rol · durum
+ *     8. Avatar
+ *     9. Form
+ *    10. Tablo
+ *    11. DataTables uyumu
+ *    12. Modal
+ *    13. Toast
+ *    14. Boş durum · yükleniyor
+ *    15. Yardımcı sınıflar
+ *    16. Erişilebilirlik
+ * ================================================================== */
+
+
+/* ------------------------------------------------------------------
+ *  1) TASARIM TOKEN'LARI
+ * ------------------------------------------------------------------
+ *  "Token" = tasarımın en küçük yapı taşı. Sabit değerleri koda
+ *  dağıtmak yerine burada TEK yerde tanımlarız; tek satır değiştirerek
+ *  tüm arayüzün rengini değiştirebilirsiniz.
+ * ------------------------------------------------------------------ */
+:root {
+    /* --- Marka renkleri (logodaki lacivert → mavi geçişi) --------- */
+    --cy-brand-900: #061321;
+    --cy-brand-800: #0a2540;
+    --cy-brand-700: #0a3d73;
+    --cy-brand-600: #0b5cb5;   /* Ana marka mavisi */
+    --cy-brand-500: #1268c9;
+    --cy-brand-400: #3b8ae0;
+    --cy-brand-200: #b9d5f4;
+    --cy-brand-100: #e7f1fc;
+    --cy-brand-50:  #f4f9ff;
+
+    --cy-accent:     #0ea5e9;
+    --cy-accent-600: #0284c7;
+
+    /* --- Durum renkleri ------------------------------------------ */
+    --cy-success:      #059669;
+    --cy-success-soft: #d1fae5;
+    --cy-warning:      #d97706;
+    --cy-warning-soft: #fef3c7;
+    --cy-danger:       #dc2626;
+    --cy-danger-soft:  #fee2e2;
+    --cy-info:         #0284c7;
+    --cy-info-soft:    #e0f2fe;
+
+    /* --- Yüzeyler ve metin --------------------------------------- */
+    --cy-bg:           #f6f8fb;  /* Sayfa zemini */
+    --cy-surface:      #ffffff;  /* Kart / panel zemini */
+    --cy-surface-soft: #f8fafc;  /* İkincil zemin (tablo başlığı) */
+    --cy-surface-hover:#f1f5f9;
+    --cy-sidebar:      #ffffff;  /* Sol menü zemini */
+
+    --cy-text:         #0f172a;
+    --cy-text-soft:    #475569;
+    --cy-text-muted:   #94a3b8;
+
+    --cy-border:       #e6ebf2;
+    --cy-border-strong:#d3dbe6;
+
+    /* --- Marka gradyanı (yalnızca birincil eylem ve logo) --------- */
+    --cy-gradient: linear-gradient(135deg, var(--cy-brand-700) 0%,
+                                            var(--cy-brand-600) 55%,
+                                            var(--cy-accent-600) 100%);
+
+    /* --- Köşe yuvarlaklığı --------------------------------------- */
+    --cy-radius-xs:   .375rem;
+    --cy-radius-sm:   .5rem;
+    --cy-radius:      .75rem;
+    --cy-radius-lg:   1rem;
+    --cy-radius-pill: 999px;
+
+    /* --- Gölgeler (minimal: yalnızca yükselen yüzeylerde) --------- */
+    --cy-shadow-xs: 0 1px 2px rgba(15, 23, 42, .05);
+    --cy-shadow-sm: 0 1px 3px rgba(15, 23, 42, .07), 0 1px 2px rgba(15, 23, 42, .04);
+    --cy-shadow:    0 4px 16px rgba(15, 23, 42, .08);
+    --cy-shadow-lg: 0 20px 48px rgba(15, 23, 42, .16);
+
+    /* --- Odak halkası (klavye erişilebilirliği) ------------------- */
+    --cy-focus: 0 0 0 3px rgba(11, 92, 181, .25);
+
+    /* --- Tipografi ----------------------------------------------- */
+    --cy-font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue",
+               Roboto, Arial, sans-serif;
+    --cy-font-mono: ui-monospace, SFMono-Regular, "Cascadia Mono",
+                    Consolas, monospace;
+
+    /* --- Ölçüler ------------------------------------------------- */
+    --cy-sidebar-w:          264px;
+    --cy-sidebar-w-collapsed: 76px;
+    --cy-topbar-h:           64px;
+
+    /* --- Geçiş --------------------------------------------------- */
+    --cy-transition: .18s cubic-bezier(.4, 0, .2, 1);
+}
+
+
+/* ------------------------------------------------------------------
+ *  2) KOYU TEMA
+ * ------------------------------------------------------------------
+ *  Sadece TOKEN'ları yeniden tanımlarız; bileşen kodu aynı kalır.
+ *  Bu, tema desteğinin en sürdürülebilir yoludur.
+ *
+ *  Üç durum vardır:
+ *    - Kullanıcı "koyu" seçti          → html[data-cy-theme="dark"]
+ *    - Kullanıcı "açık" seçti          → html[data-cy-theme="light"]
+ *    - Seçim yok (sistem ayarı geçerli) → prefers-color-scheme
+ * ------------------------------------------------------------------ */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-cy-theme="light"]) {
+        --cy-bg:            #0b1220;
+        --cy-surface:       #131c2e;
+        --cy-surface-soft:  #182437;
+        --cy-surface-hover: #1d2b41;
+        --cy-sidebar:       #101828;
+
+        --cy-text:          #e8edf5;
+        --cy-text-soft:     #b3c0d4;
+        --cy-text-muted:    #7d8ca6;
+
+        --cy-border:        #223149;
+        --cy-border-strong: #2d3f5c;
+
+        --cy-brand-100:     #14263d;
+        --cy-brand-50:      #101d2f;
+        --cy-brand-200:     #2b4a72;
+
+        --cy-success-soft:  #063d2f;
+        --cy-warning-soft:  #422a06;
+        --cy-danger-soft:   #451414;
+        --cy-info-soft:     #08324a;
+
+        --cy-shadow-sm: 0 1px 3px rgba(0, 0, 0, .4);
+        --cy-shadow:    0 4px 16px rgba(0, 0, 0, .45);
+        --cy-shadow-lg: 0 20px 48px rgba(0, 0, 0, .6);
+        --cy-focus:     0 0 0 3px rgba(59, 138, 224, .35);
+    }
+}
+
+:root[data-cy-theme="dark"] {
+    --cy-bg:            #0b1220;
+    --cy-surface:       #131c2e;
+    --cy-surface-soft:  #182437;
+    --cy-surface-hover: #1d2b41;
+    --cy-sidebar:       #101828;
+
+    --cy-text:          #e8edf5;
+    --cy-text-soft:     #b3c0d4;
+    --cy-text-muted:    #7d8ca6;
+
+    --cy-border:        #223149;
+    --cy-border-strong: #2d3f5c;
+
+    --cy-brand-100:     #14263d;
+    --cy-brand-50:      #101d2f;
+    --cy-brand-200:     #2b4a72;
+
+    --cy-success-soft:  #063d2f;
+    --cy-warning-soft:  #422a06;
+    --cy-danger-soft:   #451414;
+    --cy-info-soft:     #08324a;
+
+    --cy-shadow-sm: 0 1px 3px rgba(0, 0, 0, .4);
+    --cy-shadow:    0 4px 16px rgba(0, 0, 0, .45);
+    --cy-shadow-lg: 0 20px 48px rgba(0, 0, 0, .6);
+    --cy-focus:     0 0 0 3px rgba(59, 138, 224, .35);
+}
+
+/* Tarayıcının kendi arayüzü de (kaydırma çubuğu, form kontrolleri)
+   temaya uysun. */
+:root[data-cy-theme="dark"] { color-scheme: dark; }
+:root[data-cy-theme="light"] { color-scheme: light; }
+
+
+/* ------------------------------------------------------------------
+ *  3) TEMEL
+ * ------------------------------------------------------------------ */
+body.cy-app {
+    min-height: 100vh;
+    margin: 0;
+    font-family: var(--cy-font);
+    font-size: .9375rem;          /* 15px – panelde 16px biraz iri durur */
+    line-height: 1.55;
+    color: var(--cy-text);
+    background-color: var(--cy-bg);
+
+    /* Metnin farklı ekranlarda daha yumuşak görünmesi için */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* KLAVYE ODAĞI: Fareyle tıklarken halka gösterme, klavyeyle
+   gezerken MUTLAKA göster. :focus-visible bu ayrımı otomatik yapar.
+   Odak halkasını tamamen kaldırmak ciddi bir erişilebilirlik hatasıdır. */
+.cy-app *:focus { outline: none; }
+
+.cy-app *:focus-visible {
+    outline: none;
+    box-shadow: var(--cy-focus);
+    border-radius: var(--cy-radius-xs);
+}
+
+/* İnce, temaya uyumlu kaydırma çubuğu */
+.cy-app ::-webkit-scrollbar { width: 10px; height: 10px; }
+.cy-app ::-webkit-scrollbar-track { background: transparent; }
+.cy-app ::-webkit-scrollbar-thumb {
+    background: var(--cy-border-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+}
+.cy-app ::-webkit-scrollbar-thumb:hover { background-color: var(--cy-text-muted); background-clip: content-box; }
+
+
+/* ------------------------------------------------------------------
+ *  4) TİPOGRAFİ
+ * ------------------------------------------------------------------ */
+.cy-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.25;
+    margin: 0;
+    color: var(--cy-text);
+}
+
+.cy-subtitle {
+    margin: .25rem 0 0;
+    font-size: .875rem;
+    color: var(--cy-text-muted);
+}
+
+.cy-section-title {
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 0;
+}
+
+/* Küçük, büyük harfli bölüm etiketi (menü grupları, kart başlıkları) */
+.cy-eyebrow {
+    font-size: .6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--cy-text-muted);
+}
+
+.cy-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.cy-icon--sm { width: 16px; height: 16px; }
+.cy-icon--lg { width: 26px; height: 26px; }
+
+
+/* ------------------------------------------------------------------
+ *  5) KART
+ * ------------------------------------------------------------------
+ *  Panelin temel kutusu. Ayrım için GÖLGE değil ÇİZGİ kullanır;
+ *  yan yana çok sayıda kart olduğunda gölge görsel gürültü yaratır.
+ * ------------------------------------------------------------------ */
+.cy-card {
+    background: var(--cy-surface);
+    border: 1px solid var(--cy-border);
+    border-radius: var(--cy-radius-lg);
+    box-shadow: var(--cy-shadow-xs);
+    overflow: hidden;
+}
+
+.cy-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1.05rem 1.25rem;
+    border-bottom: 1px solid var(--cy-border);
+}
+
+.cy-card__body    { padding: 1.25rem; }
+.cy-card__body--flush { padding: 0; }
+
+.cy-card__footer {
+    padding: .85rem 1.25rem;
+    background: var(--cy-surface-soft);
+    border-top: 1px solid var(--cy-border);
+    color: var(--cy-text-muted);
+    font-size: .8125rem;
+}
+
+
+/* ------------------------------------------------------------------
+ *  6) BUTONLAR
+ * ------------------------------------------------------------------
+ *  Bootstrap'in .btn sınıfıyla birlikte kullanılır:
+ *      <button class="btn cy-btn cy-btn--primary">Kaydet</button>
+ *
+ *  Tüm butonlar en az 38px yüksekliktedir; dokunmatik ekranda
+ *  rahat hedeflenebilmesi için mobilde 44px'e çıkar (bkz. admin.css).
+ * ------------------------------------------------------------------ */
+.cy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    min-height: 38px;
+    padding: .45rem .9rem;
+    border-radius: var(--cy-radius-sm);
+    border: 1px solid transparent;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background-color var(--cy-transition),
+                border-color var(--cy-transition),
+                color var(--cy-transition),
+                box-shadow var(--cy-transition);
+}
+
+.cy-btn:disabled, .cy-btn.disabled { opacity: .55; pointer-events: none; }
+
+/* Birincil eylem – sayfada TEK olmalıdır. */
+.cy-btn--primary {
+    background: var(--cy-gradient);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(11, 92, 181, .28);
+}
+.cy-btn--primary:hover,
+.cy-btn--primary:focus {
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(11, 92, 181, .38);
+}
+
+/* İkincil eylem – çizgili, sakin */
+.cy-btn--ghost {
+    background: var(--cy-surface);
+    border-color: var(--cy-border-strong);
+    color: var(--cy-text-soft);
+}
+.cy-btn--ghost:hover {
+    background: var(--cy-surface-hover);
+    border-color: var(--cy-text-muted);
+    color: var(--cy-text);
+}
+
+/* Yumuşak marka tonu – üçüncül eylem */
+.cy-btn--soft {
+    background: var(--cy-brand-100);
+    color: var(--cy-brand-600);
+}
+.cy-btn--soft:hover { background: var(--cy-brand-200); color: var(--cy-brand-700); }
+
+.cy-btn--danger { background: var(--cy-danger); color: #fff; }
+.cy-btn--danger:hover { background: #b91c1c; color: #fff; }
+
+.cy-btn--sm { min-height: 32px; padding: .3rem .65rem; font-size: .8125rem; }
+.cy-btn--block { width: 100%; }
+
+/* Yalnızca ikon taşıyan kare buton (tablo işlemleri) */
+.cy-btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: var(--cy-radius-sm);
+    border: 1px solid var(--cy-border);
+    background: var(--cy-surface);
+    color: var(--cy-text-muted);
+    transition: all var(--cy-transition);
+}
+
+.cy-btn-icon:hover { color: #fff; }
+.cy-btn-icon--view:hover   { background: var(--cy-info);    border-color: var(--cy-info); }
+.cy-btn-icon--edit:hover   { background: var(--cy-warning); border-color: var(--cy-warning); }
+.cy-btn-icon--delete:hover { background: var(--cy-danger);  border-color: var(--cy-danger); }
+
+.cy-actions { display: inline-flex; gap: .3rem; }
+
+
+/* ------------------------------------------------------------------
+ *  7) ROZET · ETİKET · ROL · DURUM
+ * ------------------------------------------------------------------ */
+.cy-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .25rem .6rem;
+    border-radius: var(--cy-radius-pill);
+    font-size: .75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    background: var(--cy-surface-soft);
+    color: var(--cy-text-soft);
+    border: 1px solid var(--cy-border);
+}
+
+.cy-badge--brand { background: var(--cy-brand-100); color: var(--cy-brand-600); border-color: transparent; }
+
+/* --- Rol rozeti ---
+   Renk burada ANLAM taşır: yetki seviyesi ne kadar yüksekse renk
+   o kadar dikkat çekici. Yine de rozetlerde metin de yazar; rengi
+   ayırt edemeyen kullanıcılar için bu şarttır. */
+.cy-role {
+    display: inline-flex;
+    align-items: center;
+    padding: .2rem .55rem;
+    border-radius: var(--cy-radius-xs);
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+}
+
+.cy-role--admin  { background: var(--cy-danger-soft);  color: var(--cy-danger); }
+.cy-role--editor { background: var(--cy-warning-soft); color: var(--cy-warning); }
+.cy-role--member { background: var(--cy-info-soft);    color: var(--cy-info); }
+
+/* --- Durum göstergesi (aktif / pasif) --- */
+.cy-status {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .2rem .55rem;
+    border: 1px solid transparent;
+    border-radius: var(--cy-radius-pill);
+    background: var(--cy-surface-soft);
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--cy-text-soft);
+    transition: all var(--cy-transition);
+}
+
+button.cy-status { cursor: pointer; }
+button.cy-status:hover { border-color: var(--cy-border-strong); background: var(--cy-surface-hover); }
+
+.cy-status__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+}
+
+.cy-status.is-active  { color: var(--cy-success); background: var(--cy-success-soft); }
+.cy-status.is-passive { color: var(--cy-text-muted); }
+
+/* Küçük gri etiket ("siz" işareti gibi) */
+.cy-tag {
+    display: inline-flex;
+    padding: .05rem .35rem;
+    border-radius: var(--cy-radius-xs);
+    font-size: .65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.cy-tag--self { background: var(--cy-brand-100); color: var(--cy-brand-600); }
+
+
+/* ------------------------------------------------------------------
+ *  8) AVATAR
+ * ------------------------------------------------------------------ */
+.cy-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--cy-radius-sm);
+    object-fit: cover;              /* Oranı bozmadan kırpar */
+    background: var(--cy-surface-soft);
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Görseli olmayan kullanıcı için baş harflerden üretilen rozet */
+.cy-avatar--initial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--cy-brand-500), var(--cy-accent));
+    color: #fff;
+    font-weight: 700;
+    font-size: .8125rem;
+    letter-spacing: .02em;
+}
+
+.cy-avatar--sm { width: 30px; height: 30px; font-size: .7rem; }
+.cy-avatar--md { width: 46px; height: 46px; font-size: 1rem; }
+.cy-avatar--lg { width: 88px; height: 88px; font-size: 1.9rem; border-radius: var(--cy-radius); }
+.cy-avatar--xl { width: 112px; height: 112px; font-size: 2.4rem; border-radius: var(--cy-radius-lg); }
+
+
+/* ------------------------------------------------------------------
+ *  9) FORM
+ * ------------------------------------------------------------------ */
+.cy-app .form-label {
+    display: block;
+    margin-bottom: .35rem;
+    font-size: .8125rem;
+    font-weight: 600;
+    color: var(--cy-text-soft);
+}
+
+.cy-app .form-control,
+.cy-app .form-select {
+    min-height: 40px;
+    padding: .5rem .75rem;
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border: 1px solid var(--cy-border-strong);
+    border-radius: var(--cy-radius-sm);
+    font-size: .875rem;
+    transition: border-color var(--cy-transition), box-shadow var(--cy-transition);
+}
+
+.cy-app .form-control:focus,
+.cy-app .form-select:focus {
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border-color: var(--cy-brand-500);
+    box-shadow: var(--cy-focus);
+}
+
+.cy-app .form-control::placeholder { color: var(--cy-text-muted); opacity: 1; }
+.cy-app .form-text { color: var(--cy-text-muted); font-size: .75rem; }
+
+/* Hatalı alan: kırmızı çizgi + altında mesaj.
+   Bootstrap kuralı: .invalid-feedback yalnızca kardeşinde .is-invalid
+   varsa görünür. */
+.cy-app .form-control.is-invalid,
+.cy-app .form-select.is-invalid {
+    border-color: var(--cy-danger);
+    box-shadow: none;
+}
+.cy-app .form-control.is-invalid:focus { box-shadow: 0 0 0 3px rgba(220, 38, 38, .2); }
+.cy-app .invalid-feedback { font-size: .75rem; color: var(--cy-danger); }
+
+/* Onay anahtarı (switch) */
+.cy-app .form-check-input {
+    background-color: var(--cy-surface-soft);
+    border-color: var(--cy-border-strong);
+}
+.cy-app .form-check-input:checked {
+    background-color: var(--cy-brand-600);
+    border-color: var(--cy-brand-600);
+}
+.cy-app .form-check-input:focus { box-shadow: var(--cy-focus); }
+.cy-app .form-check-label { font-size: .875rem; color: var(--cy-text-soft); }
+
+/* Dosya seçme alanı */
+.cy-upload {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    padding: .85rem;
+    border: 1px dashed var(--cy-border-strong);
+    border-radius: var(--cy-radius);
+    background: var(--cy-surface-soft);
+    transition: border-color var(--cy-transition), background-color var(--cy-transition);
+}
+.cy-upload:hover { border-color: var(--cy-brand-400); background: var(--cy-brand-50); }
+.cy-upload__preview { flex-shrink: 0; }
+
+/* Girdi başında ikon taşıyan alan (arama kutusu, e-posta) */
+.cy-input-icon { position: relative; }
+.cy-input-icon > .cy-icon {
+    position: absolute;
+    top: 50%;
+    left: .7rem;
+    transform: translateY(-50%);
+    color: var(--cy-text-muted);
+    pointer-events: none;
+}
+.cy-input-icon > .form-control { padding-left: 2.35rem; }
+
+
+/* ------------------------------------------------------------------
+ * 10) TABLO
+ * ------------------------------------------------------------------ */
+.cy-table {
+    --bs-table-bg: transparent;
+    width: 100%;
+    margin: 0;
+    color: var(--cy-text);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.cy-table > thead > tr > th {
+    padding: .7rem 1rem;
+    background: var(--cy-surface-soft);
+    color: var(--cy-text-muted);
+    font-size: .6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--cy-border);
+    border-top: 1px solid var(--cy-border);
+}
+
+.cy-table > tbody > tr > td {
+    padding: .7rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--cy-border);
+    background: transparent;
+}
+
+.cy-table > tbody > tr:last-child > td { border-bottom: 0; }
+.cy-table > tbody > tr { transition: background-color var(--cy-transition); }
+.cy-table > tbody > tr:hover > td { background-color: var(--cy-surface-soft); }
+
+.cy-id {
+    font-variant-numeric: tabular-nums;
+    color: var(--cy-text-muted);
+    font-size: .8125rem;
+    font-weight: 600;
+}
+
+.cy-cell-muted { color: var(--cy-text-soft); font-size: .875rem; }
+
+/* Ad + e-posta ikilisini taşıyan hücre */
+.cy-user-cell { display: flex; flex-direction: column; gap: .1rem; }
+.cy-user-cell__name { font-weight: 600; color: var(--cy-text); }
+
+/* E-posta alt satırı yalnızca DAR EKRANDA görünür; geniş ekranda
+   zaten ayrı bir sütunda gösteriliyor. Böylece mobilde sütun
+   gizlense de bilgi kaybolmaz. */
+.cy-user-cell__meta {
+    font-size: .75rem;
+    color: var(--cy-text-muted);
+    display: none;
+}
+
+
+/* ------------------------------------------------------------------
+ * 11) DATATABLES UYUMU
+ * ------------------------------------------------------------------
+ *  DataTables kendi arama kutusu / sayfalama HTML'ini üretir.
+ *  Aşağıdaki kurallar onları tasarım kalıbımıza uyarlar.
+ * ------------------------------------------------------------------ */
+.dataTables_wrapper { color: var(--cy-text-soft); }
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    font-size: .8125rem;
+    color: var(--cy-text-muted);
+    padding: .75rem 1.25rem;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    min-height: 36px;
+    margin-left: .5rem;
+    padding: .35rem .65rem;
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border: 1px solid var(--cy-border-strong);
+    border-radius: var(--cy-radius-sm);
+    font-size: .8125rem;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus,
+.dataTables_wrapper .dataTables_length select:focus {
+    outline: 0;
+    border-color: var(--cy-brand-500);
+    box-shadow: var(--cy-focus);
+}
+
+.dataTables_wrapper .page-link {
+    min-width: 36px;
+    text-align: center;
+    color: var(--cy-text-soft);
+    background: var(--cy-surface);
+    border-color: var(--cy-border);
+    border-radius: var(--cy-radius-sm);
+    margin: 0 2px;
+    font-size: .8125rem;
+}
+
+.dataTables_wrapper .page-link:hover {
+    background: var(--cy-surface-hover);
+    color: var(--cy-text);
+    border-color: var(--cy-border-strong);
+}
+
+.dataTables_wrapper .page-item.active .page-link {
+    background: var(--cy-brand-600);
+    border-color: var(--cy-brand-600);
+    color: #fff;
+}
+
+.dataTables_wrapper .page-item.disabled .page-link {
+    color: var(--cy-text-muted);
+    background: var(--cy-surface);
+    opacity: .5;
+}
+
+/* Sıralama okları – varsayılan görseller yerine CSS üçgenleri */
+.cy-table > thead > tr > th.sorting,
+.cy-table > thead > tr > th.sorting_asc,
+.cy-table > thead > tr > th.sorting_desc {
+    cursor: pointer;
+    position: relative;
+    padding-right: 1.6rem;
+}
+
+.cy-table > thead > tr > th.sorting::after,
+.cy-table > thead > tr > th.sorting_asc::after,
+.cy-table > thead > tr > th.sorting_desc::after {
+    content: "";
+    position: absolute;
+    right: .8rem;
+    top: 50%;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    opacity: .45;
+}
+
+.cy-table > thead > tr > th.sorting::after {
+    border-bottom: 5px solid currentColor;
+    margin-top: -2px;
+    opacity: .25;
+}
+.cy-table > thead > tr > th.sorting_asc::after {
+    border-bottom: 5px solid var(--cy-brand-600);
+    margin-top: -2px;
+    opacity: 1;
+}
+.cy-table > thead > tr > th.sorting_desc::after {
+    border-top: 5px solid var(--cy-brand-600);
+    margin-top: -3px;
+    opacity: 1;
+}
+
+/* DataTables'ın kendi ikon fontunu gizle (kendi oklarımızı çiziyoruz) */
+table.dataTable > thead .sorting:before,
+table.dataTable > thead .sorting:after,
+table.dataTable > thead .sorting_asc:before,
+table.dataTable > thead .sorting_asc:after,
+table.dataTable > thead .sorting_desc:before,
+table.dataTable > thead .sorting_desc:after { display: none !important; }
+
+/* "İşleniyor…" kutusu */
+.dataTables_wrapper .dataTables_processing {
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border: 1px solid var(--cy-border);
+    border-radius: var(--cy-radius);
+    box-shadow: var(--cy-shadow);
+    padding: .6rem 1.1rem;
+    font-size: .8125rem;
+    font-weight: 600;
+}
+
+
+/* ------------------------------------------------------------------
+ * 12) MODAL
+ * ------------------------------------------------------------------ */
+.cy-modal .modal-content {
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border: 1px solid var(--cy-border);
+    border-radius: var(--cy-radius-lg);
+    box-shadow: var(--cy-shadow-lg);
+    overflow: hidden;
+}
+
+.cy-modal .modal-header {
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: var(--cy-surface);
+    border-bottom: 1px solid var(--cy-border);
+}
+
+.cy-modal .modal-title { font-size: .975rem; font-weight: 700; letter-spacing: -.01em; }
+
+.cy-modal .modal-body   { padding: 1.25rem; }
+.cy-modal .modal-footer {
+    padding: .85rem 1.25rem;
+    background: var(--cy-surface-soft);
+    border-top: 1px solid var(--cy-border);
+    gap: .5rem;
+}
+
+.cy-modal .btn-close {
+    /* Koyu temada kapatma çarpısı görünmez olmasın */
+    filter: var(--cy-close-filter, none);
+    opacity: .6;
+}
+.cy-modal .btn-close:hover { opacity: 1; }
+
+:root[data-cy-theme="dark"] { --cy-close-filter: invert(1) grayscale(1) brightness(1.8); }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-cy-theme="light"]) { --cy-close-filter: invert(1) grayscale(1) brightness(1.8); }
+}
+
+/* Etiket / değer listesi (detay modalı) */
+.cy-detail {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: .6rem 1rem;
+    margin: 0;
+    font-size: .875rem;
+}
+
+.cy-detail dt {
+    color: var(--cy-text-muted);
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding-top: .1rem;
+}
+
+.cy-detail dd { margin: 0; color: var(--cy-text); word-break: break-word; }
+
+
+/* ------------------------------------------------------------------
+ * 13) TOAST BİLDİRİMLERİ
+ * ------------------------------------------------------------------ */
+.cy-toast-container { z-index: 1090; }
+
+.cy-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    min-width: 260px;
+    max-width: 360px;
+    padding: .75rem .85rem;
+    background: var(--cy-surface);
+    color: var(--cy-text);
+    border: 1px solid var(--cy-border);
+    border-left: 3px solid var(--cy-text-muted);
+    border-radius: var(--cy-radius);
+    box-shadow: var(--cy-shadow-lg);
+    font-size: .875rem;
+}
+
+.cy-toast__icon { flex-shrink: 0; margin-top: 1px; }
+.cy-toast__body { flex: 1; }
+
+.cy-toast--success { border-left-color: var(--cy-success); }
+.cy-toast--success .cy-toast__icon { color: var(--cy-success); }
+.cy-toast--danger  { border-left-color: var(--cy-danger); }
+.cy-toast--danger .cy-toast__icon  { color: var(--cy-danger); }
+.cy-toast--warning { border-left-color: var(--cy-warning); }
+.cy-toast--warning .cy-toast__icon { color: var(--cy-warning); }
+.cy-toast--info    { border-left-color: var(--cy-info); }
+.cy-toast--info .cy-toast__icon    { color: var(--cy-info); }
+
+
+/* ------------------------------------------------------------------
+ * 14) UYARI KUTUSU · BOŞ DURUM
+ * ------------------------------------------------------------------ */
+.cy-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    padding: .75rem .9rem;
+    border-radius: var(--cy-radius-sm);
+    font-size: .8125rem;
+    border: 1px solid transparent;
+}
+
+.cy-alert--danger  { background: var(--cy-danger-soft);  color: var(--cy-danger); }
+.cy-alert--success { background: var(--cy-success-soft); color: var(--cy-success); }
+.cy-alert--warning { background: var(--cy-warning-soft); color: var(--cy-warning); }
+.cy-alert--info    { background: var(--cy-info-soft);    color: var(--cy-info); }
+
+.cy-empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--cy-text-muted);
+}
+
+.cy-empty__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto .75rem;
+    border-radius: 50%;
+    background: var(--cy-surface-soft);
+    color: var(--cy-text-muted);
+}
+
+
+/* ------------------------------------------------------------------
+ * 15) YARDIMCI SINIFLAR
+ * ------------------------------------------------------------------ */
+.cy-muted     { color: var(--cy-text-muted); }
+.cy-soft      { color: var(--cy-text-soft); }
+.cy-nowrap    { white-space: nowrap; }
+.cy-mono      { font-family: var(--cy-font-mono); font-size: .8125rem; }
+.cy-divider   { height: 1px; background: var(--cy-border); border: 0; margin: 1rem 0; }
+.cy-link      { color: var(--cy-brand-600); text-decoration: none; font-weight: 600; }
+.cy-link:hover { text-decoration: underline; color: var(--cy-brand-700); }
+
+/* Yalnızca ekran okuyucular için (görsel olarak gizli) */
+.cy-sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+
+/* ------------------------------------------------------------------
+ * 16) ERİŞİLEBİLİRLİK
+ * ------------------------------------------------------------------
+ *  Kullanıcı işletim sisteminde "hareketi azalt" ayarını açtıysa
+ *  animasyonları kapatıyoruz. Bu ayar, vestibüler rahatsızlığı olan
+ *  kullanıcılar için gerçek bir ihtiyaçtır.
+ * ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Yüksek karşıtlık modunda çizgiler kaybolmasın */
+@media (prefers-contrast: more) {
+    :root { --cy-border: #94a3b8; --cy-border-strong: #64748b; }
+}
