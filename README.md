@@ -605,7 +605,7 @@ rest-api-system/
 ├── assets/                        css · js · images
 ├── config/config.php
 ├── routes/web.php                 ★ Kapsamlar burada tanımlı
-└── docs/screenshots/
+└── docs/                          index.html · screenshots/
 ```
 
 ---

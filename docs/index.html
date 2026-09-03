@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ekran Görüntüleri — REST API Sistemi</title>
+<!--
+  Bu klasörde bir index dosyası olmasaydı, /docs/ adresi "403 Forbidden"
+  dönerdi: kök .htaccess'teki "Options -Indexes" dizin listelemeyi kapatıyor.
+  Listelemeyi açmak çözüm değil — o zaman app/, config/, views/ gibi
+  klasörlerin içeriği de dışarıya listelenirdi. Doğru çözüm, dışarıya AÇIK
+  olması istenen tek klasöre (docs/) kendi giriş sayfasını koymaktır.
+-->
+<style>
+:root{
+    --cy-bg:#f6f8fb; --cy-surface:#ffffff; --cy-surface-soft:#f8fafc;
+    --cy-text:#0f172a; --cy-text-soft:#475569; --cy-text-muted:#94a3b8;
+    --cy-border:#e6ebf2; --cy-accent:#0ea5e9; --cy-brand-900:#061321;
+}
+@media (prefers-color-scheme: dark){
+    :root{
+        --cy-bg:#0b1220; --cy-surface:#131c2e; --cy-surface-soft:#182437;
+        --cy-text:#e8edf5; --cy-text-soft:#b3c0d4; --cy-text-muted:#7d8ca6;
+        --cy-border:#223149;
+    }
+}
+*{box-sizing:border-box}
+body{
+    margin:0; padding:2.5rem 1.25rem 4rem;
+    background:var(--cy-bg); color:var(--cy-text);
+    font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.wrap{max-width:1080px;margin:0 auto}
+header{text-align:center;margin-bottom:2.5rem}
+h1{font-size:1.6rem;margin:0 0 .4rem}
+.lead{color:var(--cy-text-soft);margin:0 0 1.25rem}
+.nav a{
+    display:inline-block;margin:.25rem .3rem;padding:.5rem .95rem;
+    border:1px solid var(--cy-border);border-radius:8px;
+    background:var(--cy-surface);color:var(--cy-text);
+    text-decoration:none;font-size:.9rem;
+}
+.nav a:hover{border-color:var(--cy-accent);color:var(--cy-accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.25rem}
+figure{
+    margin:0;background:var(--cy-surface);
+    border:1px solid var(--cy-border);border-radius:12px;overflow:hidden;
+}
+figure img{display:block;width:100%;height:auto;background:var(--cy-surface-soft)}
+figcaption{
+    padding:.7rem .9rem;font-size:.87rem;color:var(--cy-text-soft);
+    border-top:1px solid var(--cy-border);
+}
+footer{
+    margin-top:3rem;text-align:center;
+    font-size:.85rem;color:var(--cy-text-muted);
+}
+footer a{color:var(--cy-text-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+    <h1>REST API Sistemi — Ekran Görüntüleri</h1>
+    <p class="lead">Jeton yetkilendirme, kapsam denetimi, hız sınırı ve sayfalama örneği.</p>
+    <nav class="nav">
+        <a href="../">← Demoyu aç</a>
+        <a href="https://github.com/CilginYazilim/rest-api-system">GitHub deposu</a>
+        <a href="https://cilginyazilim.com/kutuphane/php-rest-api-panel">Kaynak kütüphanesi</a>
+    </nav>
+</header>
+
+<div class="grid">
+    <figure><img src="screenshots/01-giris.png" alt="Giriş ekranı" loading="lazy"><figcaption>Giriş ekranı</figcaption></figure>
+    <figure><img src="screenshots/02-kontrol-paneli.png" alt="Kontrol paneli" loading="lazy"><figcaption>Kontrol paneli</figcaption></figure>
+    <figure><img src="screenshots/03-api-jetonlari.png" alt="API jetonları" loading="lazy"><figcaption>API jetonları — üretim ve kapsam seçimi</figcaption></figure>
+    <figure><img src="screenshots/04-api-belgeleri.png" alt="API belgeleri" loading="lazy"><figcaption>API belgeleri</figcaption></figure>
+    <figure><img src="screenshots/05-koyu-tema.png" alt="Koyu tema" loading="lazy"><figcaption>Koyu tema</figcaption></figure>
+    <figure><img src="screenshots/06-mobil.png" alt="Mobil görünüm" loading="lazy"><figcaption>Mobil görünüm</figcaption></figure>
+</div>
+
+<footer>
+    <a href="https://cilginyazilim.com">Çılgın Yazılım</a> · MIT Lisansı
+</footer>
+
+</div>
+</body>
+</html>

@@ -16,8 +16,10 @@
 #  içindeki tüm dosyalar listelenirdi.
 Options -Indexes
 
-# Varsayılan giriş dosyası
-DirectoryIndex index.php
+# Varsayılan giriş dosyası. index.html de listede: dizin listeleme kapalı
+# olduğu için, kendi index'i olmayan bir klasöre girildiğinde 403 dönüyor.
+# Dışarıya açık olması istenen klasörler (docs/) kendi index.html'ini koyar.
+DirectoryIndex index.php index.html
 
 # ---------------------------------------------------------------------
 #  2) HASSAS DOSYALARA ERİŞİM ENGELİ
