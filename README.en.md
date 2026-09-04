@@ -189,9 +189,9 @@ curl -H "Authorization: Bearer cy_9f2b..." \
     "has_more": true
   },
   "links": {
-    "self": "http://localhost/rest-api-system/api/v1/users?page=2&per=10",
-    "next": "http://localhost/rest-api-system/api/v1/users?page=3&per=10",
-    "prev": "http://localhost/rest-api-system/api/v1/users?page=1&per=10"
+    "self": "/rest-api-system/api/v1/users?per=10&page=2",
+    "next": "/rest-api-system/api/v1/users?per=10&page=3",
+    "prev": "/rest-api-system/api/v1/users?per=10&page=1"
   }
 }
 ```
@@ -386,9 +386,9 @@ curl -H "Authorization: Bearer cy_..." \
               "email": "fatma.yildiz@ornek.com", "is_active": false,
               "created_at": "2025-01-15T23:58:29+03:00" } ],
   "meta":  { "total": 51, "per_page": 10, "current_page": 2, "last_page": 6, "from": 11, "to": 20, "has_more": true },
-  "links": { "self": "...page=2&per=10",
-             "next": "...page=3&per=10",
-             "prev": "...page=1&per=10" }
+  "links": { "self": "...?per=10&page=2",
+             "next": "...?per=10&page=3",
+             "prev": "...?per=10&page=1" }
 }
 ```
 

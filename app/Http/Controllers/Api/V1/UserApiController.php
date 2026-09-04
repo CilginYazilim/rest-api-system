@@ -22,7 +22,7 @@
  *
  *  ---------------------------------------------------------------
  *  BU SINIFTA PAROLA DÖNDÜRÜLMEZ, HASH BİLE.
- *  User::toArray() parola alanını hiç taşımaz; "unutmak" mümkün
+ *  User::toApiArray() parola alanını hiç taşımaz; "unutmak" mümkün
  *  olmasın diye kısıtlama VARLIK sınıfına konmuştur.
  * =====================================================================
  */
@@ -76,9 +76,12 @@ final class UserApiController extends Controller
         );
 
         ApiResponse::collection(
-            array_map(static fn (User $user): array => $user->toArray(), $rows),
+            array_map(static fn (User $user): array => $user->toApiArray(), $rows),
             $paginator,
-            'api/v1/users'
+            'api/v1/users',
+            // Sayfalama bağlantıları bu filtreleri korumalı; aksi hâlde
+            // "next" farklı bir listeye götürür (bkz. ApiResponse::collection).
+            ['per' => $perPage, 'q' => $search, 'status' => $request->input('status')]
         );
     }
 
@@ -99,7 +102,7 @@ final class UserApiController extends Controller
             ApiResponse::error('not_found', 'Kullanıcı bulunamadı.', 404);
         }
 
-        ApiResponse::data($user->toArray());
+        ApiResponse::data($user->toApiArray());
     }
 
     /* =================================================================
@@ -146,7 +149,7 @@ final class UserApiController extends Controller
         /* 201 + Location: "oluşturdum, ŞU adreste" demek istemciye
          * fazladan bir arama isteği yaptırmaz. */
         ApiResponse::created(
-            $user?->toArray() ?? ['id' => $id],
+            $user?->toApiArray() ?? ['id' => $id],
             Router::basePath() . '/api/v1/users/' . $id
         );
     }
@@ -213,7 +216,7 @@ final class UserApiController extends Controller
 
         $this->users()->update($id, $fields);
 
-        ApiResponse::data($this->users()->find($id)?->toArray() ?? []);
+        ApiResponse::data($this->users()->find($id)?->toApiArray() ?? []);
     }
 
     /* =================================================================

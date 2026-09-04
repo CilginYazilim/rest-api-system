@@ -150,6 +150,66 @@ final class User
     }
 
     /**
+     * REST uç noktaları için dizi.
+     *
+     * NEDEN toArray()'DEN AYRI?
+     * ÖLÇÜLEN SORUN: Panel ile API aynı toArray()'i paylaşıyordu ve
+     * API şunu döndürüyordu:
+     *
+     *     "created_at":    "13.02.2025 09:17"      ← ekran biçimi
+     *     "last_login_at": "—"                     ← em dash
+     *
+     * İkisi de bir İNSAN için doğru, bir İSTEMCİ için yanlıştır:
+     *   · "13.02.2025 09:17" hangi zaman diliminde olduğunu söylemez;
+     *     ayrıştırmak için istemcinin Türkçe biçimi bilmesi gerekir.
+     *   · "—" bir tarih değildir. "Değer yok" demenin JSON'daki
+     *     karşılığı null'dır; istemci `if (x === null)` yazabilmelidir.
+     *
+     * Üstelik bu deponun kendi README'si ISO 8601 vaat ediyordu.
+     *
+     * ÇÖZÜM: Panelin biçimi toArray()'de kaldı (orada DOĞRU),
+     * API kendi dizisini kullanıyor. Ekran biçimini değiştirmek
+     * artık API sözleşmesini bozmuyor — iki ihtiyaç ayrıldı.
+     *
+     * @return array<string,mixed>
+     */
+    public function toApiArray(): array
+    {
+        return [
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'surname'       => $this->surname,
+            'full_name'     => $this->fullName(),
+            'email'         => $this->email,
+            'is_active'     => $this->isActive,
+            'theme'         => $this->theme,
+            'last_login_at' => self::isoDate($this->lastLoginAt),
+            'created_at'    => self::isoDate($this->createdAt),
+        ];
+    }
+
+    /**
+     * Veritabanı tarihini ISO 8601'e çevirir (RFC 3339):
+     *   "2025-01-06 19:34:27"  →  "2025-01-06T19:34:27+03:00"
+     *
+     * Ofsetin yazılması ŞART: ofsetsiz bir damga, istemcinin kendi
+     * dilimini varsaymasına yol açar ve yaz saati geçişlerinde
+     * sessizce bir saat kayar. Değer yoksa null döner — "—" değil.
+     */
+    public static function isoDate(?string $value): ?string
+    {
+        if ($value === null || $value === '' || str_starts_with($value, '0000')) {
+            return null;
+        }
+
+        try {
+            return (new DateTimeImmutable($value))->format(DATE_ATOM);
+        } catch (\Exception) {
+            return null;
+        }
+    }
+
+    /**
      * Veritabanı tarihini okunabilir hale getirir:
      *   "2025-01-06 19:34:27"  →  "06.01.2025 19:34"
      */

@@ -6,6 +6,75 @@ kurallarına uyar.
 
 ---
 
+## [2.0.0] — 2026-09-04
+
+### Değiştirildi — UYUMSUZ (API sözleşmesi)
+
+- **`/api/v1/users` yanıtındaki tarihler artık ISO 8601 (RFC 3339).**
+
+  **Ölçülen sorun:** Panel ile REST uç noktası aynı `User::toArray()`
+  metodunu paylaşıyordu ve API şunu döndürüyordu:
+
+  ```json
+  "created_at":    "13.02.2025 09:17",
+  "last_login_at": "—"
+  ```
+
+  İkisi de bir **insan** için doğru, bir **istemci** için yanlıştır:
+  `13.02.2025 09:17` hangi zaman diliminde olduğunu söylemez ve
+  ayrıştırmak için istemcinin Türkçe biçimi bilmesi gerekir; `—` ise bir
+  tarih değildir — "değer yok"un JSON'daki karşılığı `null`'dır.
+
+  Üstelik bu deponun **kendi README'si** ISO 8601 vaat ediyordu. Yani
+  belge doğruydu, kod belgeye uymuyordu.
+
+  Yeni çıktı:
+
+  ```json
+  "created_at":    "2025-02-11T10:55:00+03:00",
+  "last_login_at": null
+  ```
+
+  Panelin ekran biçimi **değişmedi**: `User::toArray()` olduğu gibi
+  duruyor, API kendi `User::toApiArray()` metodunu kullanıyor. İki ihtiyaç
+  ayrıldığı için ekran biçimini değiştirmek artık API sözleşmesini
+  bozmuyor.
+
+  **Göç:** `created_at` / `last_login_at` alanlarını okuyan istemciler
+  ayrıştırmayı ISO 8601'e çevirmeli ve `"—"` yerine `null` kontrolü
+  yapmalıdır.
+
+### Düzeltildi
+
+- **Sayfalama bağlantıları filtreyi kaybediyordu.**
+
+  `GET /api/v1/users?per=10&page=2` isteğinin yanıtında bağlantılar şöyle
+  geliyordu:
+
+  ```json
+  "links": { "self": "…?page=2", "next": "…?page=3", "prev": "…?page=1" }
+  ```
+
+  `per` ve `q` düşüyordu. `next` bağlantısını izleyen bir istemci, sayfa
+  boyutu sessizce varsayılana (`20`) döndüğü için **10 kaydı atlıyordu** —
+  hata vermeden, eksik veriyle. Sayfalama bağlantısının tek işi "aynı
+  listenin sonraki sayfası"nı göstermektir; filtre değişiyorsa o artık
+  aynı liste değildir.
+
+  `ApiResponse::collection()` artık korunacak sorgu parametrelerini
+  alıyor; `UserApiController::index()` `per`, `q` ve `status` değerlerini
+  geçiriyor (boş olanlar adrese yazılmaz). Doğrulanan çıktı:
+
+  ```json
+  "next": "/rest-api-system/api/v1/users?per=10&status=active&page=3"
+  ```
+
+- README'deki örnek bağlantılar mutlak adres gösteriyordu
+  (`http://localhost/…?page=3&per=10`); uygulama göreli yol üretir.
+  Örnekler gerçek çıktıyla eşleştirildi.
+
+---
+
 ## [1.1.0] — 2026-09-03
 
 ### Eklendi

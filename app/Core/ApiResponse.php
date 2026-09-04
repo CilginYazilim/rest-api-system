@@ -98,9 +98,20 @@ final class ApiResponse
      * yanıtlayamaz ve ya eksik veri gösterir ya da sonsuz döngüye
      * girer.
      *
-     * @param array<int,mixed> $items
+     * BAĞLANTILAR FİLTREYİ TAŞIMALIDIR
+     * ÖLÇÜLEN SORUN: `?per=10&page=2` isteğinin yanıtındaki bağlantılar
+     * `?page=3` idi — `per` ve `q` düşüyordu. "next" bağlantısını
+     * izleyen bir istemci sayfa boyutunun sessizce 20'ye dönmesi
+     * yüzünden 10 kaydı ATLIYORDU. Sayfalama bağlantısının tek işi
+     * "aynı listenin sonraki sayfası"nı göstermektir; filtre
+     * değişiyorsa o artık aynı liste değildir.
+     *
+     * ÇÖZÜM: Çağıran, korunacak sorgu parametrelerini $query ile verir.
+     *
+     * @param array<int,mixed>            $items
+     * @param array<string,string|int>    $query  Bağlantılarda korunacak filtreler
      */
-    public static function collection(array $items, Paginator $paginator, string $route = ''): never
+    public static function collection(array $items, Paginator $paginator, string $route = '', array $query = []): never
     {
         $meta = $paginator->toArray();
 
@@ -110,10 +121,13 @@ final class ApiResponse
         $links = [];
 
         if ($route !== '') {
+            // Boş değerler adrese yazılmasın: "?q=&status=" gürültüdür.
+            $query = array_filter($query, static fn ($v): bool => $v !== null && $v !== '');
+
             $links = [
-                'self' => $paginator->url($paginator->currentPage(), $route),
-                'next' => $paginator->onLastPage()  ? null : $paginator->url($paginator->currentPage() + 1, $route),
-                'prev' => $paginator->onFirstPage() ? null : $paginator->url($paginator->currentPage() - 1, $route),
+                'self' => $paginator->url($paginator->currentPage(), $route, $query),
+                'next' => $paginator->onLastPage()  ? null : $paginator->url($paginator->currentPage() + 1, $route, $query),
+                'prev' => $paginator->onFirstPage() ? null : $paginator->url($paginator->currentPage() - 1, $route, $query),
             ];
         }
 

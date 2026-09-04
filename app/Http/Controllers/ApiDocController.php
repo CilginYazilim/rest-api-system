@@ -69,13 +69,23 @@ final class ApiDocController extends Controller
                 'response' => <<<'JSON'
 {
   "data": [
-    { "id": 51, "name": "Beyza", "surname": "SARI", "email": "…", "is_active": true }
+    {
+      "id": 51, "name": "Beyza", "surname": "SARI",
+      "full_name": "Beyza SARI", "email": "beyza.sari@ornek.com",
+      "is_active": true, "theme": "light",
+      "last_login_at": null,
+      "created_at": "2025-02-23T10:36:00+03:00"
+    }
   ],
   "meta": {
     "total": 51, "per_page": 20, "current_page": 1,
     "last_page": 3, "from": 1, "to": 20, "has_more": true
   },
-  "links": { "self": "…", "next": "…", "prev": null }
+  "links": {
+    "self": "/api/v1/users?per=20&page=1",
+    "next": "/api/v1/users?per=20&page=2",
+    "prev": null
+  }
 }
 JSON,
             ],
@@ -87,7 +97,15 @@ JSON,
                 'summary' => 'Tek bir kullanıcıyı döndürür.',
                 'params'  => ['id' => 'Kullanıcı kimliği (adreste taşınır).'],
                 'response' => <<<'JSON'
-{ "data": { "id": 5, "name": "Elif", "surname": "KAYA", "email": "…" } }
+{
+  "data": {
+    "id": 5, "name": "Elif", "surname": "KAYA",
+    "full_name": "Elif KAYA", "email": "elif.kaya@ornek.com",
+    "is_active": true, "theme": "light",
+    "last_login_at": "2026-09-03T21:14:07+03:00",
+    "created_at": "2025-01-18T08:02:00+03:00"
+  }
+}
 JSON,
             ],
 
